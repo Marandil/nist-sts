@@ -24,7 +24,7 @@ displayGeneratorOptions()
 	printf("    [6] Modular Exponentiation     [7] Blum-Blum-Shub\n");
 	printf("    [8] Micali-Schnorr             [9] G Using SHA-1\n\n");
 	printf("   Enter Choice: ");
-	scanf("%d", &option);
+	safe_scanf("%d", &option);
 	printf("\n\n");
 
 	return option;
@@ -37,13 +37,13 @@ generatorOptions(char** streamFile)
 	char	file[200];
 	int		option = NUMOFGENERATORS+1;
 	FILE	*fp;
-	
+
 	while ( (option < 0) || (option > NUMOFGENERATORS) ) {
 		option = displayGeneratorOptions();
 		switch( option ) {
 			case 0:
 				printf("\t\tUser Prescribed Input File: ");
-				scanf("%s", file);
+				safe_scanf("%s", file);
 				*streamFile = (char*)calloc(200, sizeof(char));
 				sprintf(*streamFile, "%s", file);
 				printf("\n");
@@ -81,7 +81,7 @@ generatorOptions(char** streamFile)
 			case 9:
 				*streamFile = "G using SHA-1";
 				break;
-				
+
 			/* INTRODUCE NEW PRNG NAMES HERE */
 			/*
 			case 10:  *streamFile = "myNewPRNG";
@@ -100,7 +100,7 @@ void
 chooseTests()
 {
 	int		i;
-	
+
 	printf("                S T A T I S T I C A L   T E S T S\n");
 	printf("                _________________________________\n\n");
 	printf("    [01] Frequency                       [02] Block Frequency\n");
@@ -110,12 +110,12 @@ chooseTests()
 	printf("    [09] Overlapping Template Matchings  [10] Universal Statistical\n");
 	printf("    [11] Approximate Entropy             [12] Random Excursions\n");
 	printf("    [13] Random Excursions Variant       [14] Serial\n");
-	printf("    [15] Linear Complexity\n\n");
+	printf("    [15] Linear Complexity               [16] Gambler\n\n");
 	printf("         INSTRUCTIONS\n");
 	printf("            Enter 0 if you DO NOT want to apply all of the\n");
 	printf("            statistical tests to each sequence and 1 if you DO.\n\n");
 	printf("   Enter Choice: ");
-	scanf("%d", &testVector[0]);
+	safe_scanf("%d", &testVector[0]);
 	printf("\n");
 	if ( testVector[0] == 1 )
 		for( i=1; i<=NUMOFTESTS; i++ )
@@ -124,11 +124,11 @@ chooseTests()
 		printf("         INSTRUCTIONS\n");
 		printf("            Enter a 0 or 1 to indicate whether or not the numbered statistical\n");
 		printf("            test should be applied to each sequence.\n\n");
-		printf("      123456789111111\n");
-		printf("               012345\n");
+		printf("      1234567891111111\n");
+		printf("               0123456\n");
 		printf("      ");
-		for ( i=1; i<=NUMOFTESTS; i++ ) 
-			scanf("%1d", &testVector[i]);
+		for ( i=1; i<=NUMOFTESTS; i++ )
+			safe_scanf("%1d", &testVector[i]);
 		printf("\n\n");
 	}
 }
@@ -138,13 +138,14 @@ void
 fixParameters()
 {
 	int		counter, testid;
-	
+
 	//  Check to see if any parameterized tests are selected
-	if ( (testVector[TEST_BLOCK_FREQUENCY] != 1) && (testVector[TEST_NONPERIODIC] != 1) && 
+	if ( (testVector[TEST_BLOCK_FREQUENCY] != 1) && (testVector[TEST_NONPERIODIC] != 1) &&
 		 (testVector[TEST_OVERLAPPING] != 1) && (testVector[TEST_APEN] != 1) &&
-		 (testVector[TEST_SERIAL] != 1) && (testVector[TEST_LINEARCOMPLEXITY] != 1) )
+		 (testVector[TEST_SERIAL] != 1) && (testVector[TEST_LINEARCOMPLEXITY] != 1)  &&
+		 (testVector[TEST_GAMBLER] != 1) )
 			return;
-		
+
 	do {
 		counter = 1;
 		printf("        P a r a m e t e r   A d j u s t m e n t s\n");
@@ -161,17 +162,19 @@ fixParameters()
 			printf("    [%d] Serial Test - block length(m):                  %d\n", counter++, tp.serialBlockLength);
 		if ( testVector[TEST_LINEARCOMPLEXITY] == 1 )
 			printf("    [%d] Linear Complexity Test - block length(M):       %d\n", counter++, tp.linearComplexitySequenceLength);
+		if ( testVector[TEST_GAMBLER] == 1 )
+			printf("    [%d] Gambler - runs per starting point(M):           %d\n", counter++, tp.gamblerRunsPerStartingPoint);
 		printf("\n");
 		printf("   Select Test (0 to continue): ");
-		scanf("%1d", &testid);
+		safe_scanf("%1d", &testid);
 		printf("\n");
-		
+
 		counter = 0;
 		if ( testVector[TEST_BLOCK_FREQUENCY] == 1 ) {
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Block Frequency Test block length: ");
-				scanf("%d", &tp.blockFrequencyBlockLength);
+				safe_scanf("%d", &tp.blockFrequencyBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -180,7 +183,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter NonOverlapping Template Test block Length: ");
-				scanf("%d", &tp.nonOverlappingTemplateBlockLength);
+				safe_scanf("%d", &tp.nonOverlappingTemplateBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -189,7 +192,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Overlapping Template Test block Length: ");
-				scanf("%d", &tp.overlappingTemplateBlockLength);
+				safe_scanf("%d", &tp.overlappingTemplateBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -198,7 +201,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Approximate Entropy Test block Length: ");
-				scanf("%d", &tp.approximateEntropyBlockLength);
+				safe_scanf("%d", &tp.approximateEntropyBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -207,7 +210,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Serial Test block Length: ");
-				scanf("%d", &tp.serialBlockLength);
+				safe_scanf("%d", &tp.serialBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -216,7 +219,16 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Linear Complexity Test block Length: ");
-				scanf("%d", &tp.linearComplexitySequenceLength);
+				safe_scanf("%d", &tp.linearComplexitySequenceLength);
+				printf("\n");
+				continue;
+			}
+		}
+		if ( testVector[TEST_GAMBLER] == 1 ) {
+			counter++;
+			if ( counter == testid ) {
+				printf("   Enter number of runs per Gambler's starting point: ");
+				safe_scanf("%d", &tp.gamblerRunsPerStartingPoint);
 				printf("\n");
 				continue;
 			}
@@ -230,12 +242,12 @@ fileBasedBitStreams(char *streamFile)
 {
 	FILE	*fp;
 	int		mode;
-	
+
 	printf("   Input File Format:\n");
 	printf("    [0] ASCII - A sequence of ASCII 0's and 1's\n");
 	printf("    [1] Binary - Each byte in data file contains 8 bits of data\n\n");
 	printf("   Select input mode:  ");
-	scanf("%1d", &mode);
+	safe_scanf("%1d", &mode);
 	printf("\n");
 	if ( mode == 0 ) {
 		if ( (fp = fopen(streamFile, "r")) == NULL ) {
@@ -260,13 +272,13 @@ void
 readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile)
 {
 	int		i, j, num_0s, num_1s, bitsRead, bit;
-	
+
 	if ( (epsilon = (BitSequence *) calloc(tp.n, sizeof(BitSequence))) == NULL ) {
 		printf("BITSTREAM DEFINITION:  Insufficient memory available.\n");
 		printf("Statistical Testing Aborted!\n");
 		return;
 	}
-	printf("     Statistical Testing In Progress.........\n\n");   
+	printf("     Statistical Testing In Progress.........\n\n");
 	for ( i=0; i<tp.numOfBitStreams; i++ ) {
 		num_0s = 0;
 		num_1s = 0;
@@ -280,9 +292,9 @@ readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile)
 			}
 			else {
 				bitsRead++;
-				if ( bit == 0 ) 
+				if ( bit == 0 )
 					num_0s++;
-				else 
+				else
 					num_1s++;
 				epsilon[j] = bit;
 			}
@@ -299,13 +311,13 @@ readHexDigitsInBinaryFormat(FILE *fp)
 {
 	int		i, done, num_0s, num_1s, bitsRead;
 	BYTE	buffer[4];
-	
+
 	if ( (epsilon = (BitSequence *) calloc(tp.n,sizeof(BitSequence))) == NULL ) {
 		printf("BITSTREAM DEFINITION:  Insufficient memory available.\n");
 		return;
 	}
 
-	printf("     Statistical Testing In Progress.........\n\n");   
+	printf("     Statistical Testing In Progress.........\n\n");
 	for ( i=0; i<tp.numOfBitStreams; i++ ) {
 		num_0s = 0;
 		num_1s = 0;
@@ -320,9 +332,9 @@ readHexDigitsInBinaryFormat(FILE *fp)
 			done = convertToBits(buffer, 32, tp.n, &num_0s, &num_1s, &bitsRead);
 		} while ( !done );
 		fprintf(freqfp, "\t\tBITSREAD = %d 0s = %d 1s = %d\n", bitsRead, num_0s, num_1s);
-		
+
 		nist_test_suite();
-		
+
 	}
 	free(epsilon);
 }
@@ -359,7 +371,7 @@ convertToBits(BYTE *x, int xBitLength, int bitsNeeded, int *num_0s, int *num_1s,
 				return 0;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -369,7 +381,7 @@ openOutputStreams(int option)
 {
 	int		i, numOfBitStreams, numOfOpenFiles = 0;
 	char	freqfn[200], summaryfn[200], statsDir[200], resultsDir[200];
-	
+
 	sprintf(freqfn, "experiments/%s/freq.txt", generatorDir[option]);
 	if ( (freqfp = fopen(freqfn, "w")) == NULL ) {
 		printf("\t\tMAIN:  Could not open freq file: <%s>", freqfn);
@@ -380,7 +392,7 @@ openOutputStreams(int option)
 		printf("\t\tMAIN:  Could not open stats file: <%s>", summaryfn);
 		exit(-1);
 	}
-	
+
 	for( i=1; i<=NUMOFTESTS; i++ ) {
 		if ( testVector[i] == 1 ) {
 			sprintf(statsDir, "experiments/%s/%s/stats.txt", generatorDir[option], testNames[i]);
@@ -404,7 +416,7 @@ openOutputStreams(int option)
 		}
 	}
 	printf("   How many bitstreams? ");
-	scanf("%d", &numOfBitStreams);
+	safe_scanf("%d", &numOfBitStreams);
 	tp.numOfBitStreams = numOfBitStreams;
 	printf("\n");
 }
@@ -449,9 +461,9 @@ invokeTestSuite(int option, char *streamFile)
 		case 9:
 			SHA1();
 			break;
-			
+
 		/* INTRODUCE NEW PSEUDO RANDOM NUMBER GENERATORS HERE */
-			
+
 		default:
 			printf("Error in invokeTestSuite!\n");
 			break;
@@ -463,48 +475,51 @@ invokeTestSuite(int option, char *streamFile)
 void
 nist_test_suite()
 {
-	if ( (testVector[0] == 1) || (testVector[TEST_FREQUENCY] == 1) ) 
+	if ( (testVector[0] == 1) || (testVector[TEST_FREQUENCY] == 1) )
 		Frequency(tp.n);
-	
-	if ( (testVector[0] == 1) || (testVector[TEST_BLOCK_FREQUENCY] == 1) ) 
+
+	if ( (testVector[0] == 1) || (testVector[TEST_BLOCK_FREQUENCY] == 1) )
 		BlockFrequency(tp.blockFrequencyBlockLength, tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_CUSUM] == 1) )
 		CumulativeSums(tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_RUNS] == 1) )
-		Runs(tp.n); 
-	
+		Runs(tp.n);
+
 	if ( (testVector[0] == 1) || (testVector[TEST_LONGEST_RUN] == 1) )
 		LongestRunOfOnes(tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_RANK] == 1) )
 		Rank(tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_FFT] == 1) )
 		DiscreteFourierTransform(tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_NONPERIODIC] == 1) )
 		NonOverlappingTemplateMatchings(tp.nonOverlappingTemplateBlockLength, tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_OVERLAPPING] == 1) )
 		OverlappingTemplateMatchings(tp.overlappingTemplateBlockLength, tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_UNIVERSAL] == 1) )
 		Universal(tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_APEN] == 1) )
 		ApproximateEntropy(tp.approximateEntropyBlockLength, tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_RND_EXCURSION] == 1) )
 		RandomExcursions(tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_RND_EXCURSION_VAR] == 1) )
 		RandomExcursionsVariant(tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_SERIAL] == 1) )
 		Serial(tp.serialBlockLength,tp.n);
-	
+
 	if ( (testVector[0] == 1) || (testVector[TEST_LINEARCOMPLEXITY] == 1) )
 		LinearComplexity(tp.linearComplexitySequenceLength, tp.n);
+
+	if ( (testVector[0] == 1) || (testVector[TEST_GAMBLER] == 1) )
+		Gambler(tp.gamblerRunsPerStartingPoint, tp.n);
 }

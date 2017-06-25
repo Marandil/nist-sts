@@ -17,13 +17,13 @@
 #define isZero(x)            ((x) == 0.e0 ?   1 : 0)
 #define isOne(x)             ((x) == 1.e0 ?   1 : 0)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
                          G L O B A L  C O N S T A N T S
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define ALPHA							0.01	/* SIGNIFICANCE LEVEL */
 #define MAXNUMOFTEMPLATES				148		/* APERIODIC TEMPLATES: 148=>temp_length=9 */
-#define NUMOFTESTS						15		/* MAX TESTS DEFINED  */
+#define NUMOFTESTS						16		/* MAX TESTS DEFINED  */
 #define NUMOFGENERATORS					10		/* MAX PRNGs */
 #define MAXFILESPERMITTEDFORPARTITION	148
 #define	TEST_FREQUENCY					1
@@ -41,6 +41,7 @@
 #define	TEST_RND_EXCURSION_VAR			13
 #define	TEST_SERIAL						14
 #define	TEST_LINEARCOMPLEXITY			15
+#define	TEST_GAMBLER			16
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -57,5 +58,6 @@ typedef struct _testParameters {
 	int		serialBlockLength;
 	int		linearComplexitySequenceLength;
 	int		approximateEntropyBlockLength;
+	int		gamblerRunsPerStartingPoint;
 	int		numOfBitStreams;
 } TP;

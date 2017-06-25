@@ -1,8 +1,8 @@
-
+#include <stdio.h>
 #include "../include/defs.h"
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-                   G L O B A L   D A T A  S T R U C T U R E S 
+                   G L O B A L   D A T A  S T R U C T U R E S
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 extern BitSequence	*epsilon;				// BIT STREAM

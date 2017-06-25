@@ -1,5 +1,5 @@
 CC = /usr/bin/gcc
-GCCFLAGS = -c -Wall
+GCCFLAGS = -c -Wall -g
 ROOTDIR = .
 SRCDIR = $(ROOTDIR)/src
 OBJDIR = $(ROOTDIR)/obj
@@ -8,7 +8,7 @@ VPATH  = src:obj:include
 OBJ = $(OBJDIR)/assess.o $(OBJDIR)/frequency.o $(OBJDIR)/blockFrequency.o \
       $(OBJDIR)/cusum.o $(OBJDIR)/runs.o $(OBJDIR)/longestRunOfOnes.o \
       $(OBJDIR)/serial.o $(OBJDIR)/rank.o $(OBJDIR)/discreteFourierTransform.o \
-      $(OBJDIR)/nonOverlappingTemplateMatchings.o \
+      $(OBJDIR)/nonOverlappingTemplateMatchings.o $(OBJDIR)/gambler.o \
       $(OBJDIR)/overlappingTemplateMatchings.o $(OBJDIR)/universal.o \
       $(OBJDIR)/approximateEntropy.o $(OBJDIR)/randomExcursions.o \
       $(OBJDIR)/randomExcursionsVariant.o $(OBJDIR)/linearComplexity.o \
@@ -23,6 +23,9 @@ $(OBJDIR)/assess.o: $(SRCDIR)/assess.c defs.h decls.h utilities.h
 
 $(OBJDIR)/frequency.o: $(SRCDIR)/frequency.c defs.h externs.h
 	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/frequency.c
+
+$(OBJDIR)/gambler.o: $(SRCDIR)/gambler.c defs.h externs.h
+	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/gambler.c
 
 $(OBJDIR)/blockFrequency.o: $(SRCDIR)/blockFrequency.c defs.h externs.h
 	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/blockFrequency.c

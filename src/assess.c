@@ -16,15 +16,15 @@
                   Revised by J. Soto, November 1999
                   Revised by Larry Bassham, March 2008
 
-   Keywords    :  Pseudorandom Number Generator (PRNG), Randomness, Statistical 
-                  Tests, Complementary Error functions, Incomplete Gamma 
-                  Function, Random Walks, Rank, Fast Fourier Transform, 
+   Keywords    :  Pseudorandom Number Generator (PRNG), Randomness, Statistical
+                  Tests, Complementary Error functions, Incomplete Gamma
+                  Function, Random Walks, Rank, Fast Fourier Transform,
                   Template, Cryptographically Secure PRNG (CSPRNG),
-                  Approximate Entropy (ApEn), Secure Hash Algorithm (SHA-1), 
-                  Blum-Blum-Shub (BBS) CSPRNG, Micali-Schnorr (MS) CSPRNG, 
+                  Approximate Entropy (ApEn), Secure Hash Algorithm (SHA-1),
+                  Blum-Blum-Shub (BBS) CSPRNG, Micali-Schnorr (MS) CSPRNG,
 
-   Source      :  David Banks, Elaine Barker, James Dray, Allen Heckert, 
-                  Stefan Leigh, Mark Levenson, James Nechvatal, Andrew Rukhin, 
+   Source      :  David Banks, Elaine Barker, James Dray, Allen Heckert,
+                  Stefan Leigh, Mark Levenson, James Nechvatal, Andrew Rukhin,
                   Miles Smid, Juan Soto, Mark Vangel, and San Vo.
 
    Technical
@@ -35,10 +35,10 @@
 
    Limitation  :  Amount of memory allocated for workspace.
 
-   Restrictions:  Permission to use, copy, and modify this software without 
-                  fee is hereby granted, provided that this entire notice is 
+   Restrictions:  Permission to use, copy, and modify this software without
+                  fee is hereby granted, provided that this entire notice is
                   included in all copies of any software which is or includes
-                  a copy or modification of this software and in all copies 
+                  a copy or modification of this software and in all copies
                   of the supporting documentation for such software.
    -------------------------------------------------------------------------- */
 
@@ -47,7 +47,7 @@
 #include <math.h>
 #include <string.h>
 #include "../include/decls.h"
-#include "../include/cephes.h"  
+#include "../include/cephes.h"
 #include "../include/utilities.h"
 
 void	partitionResultFile(int numOfFiles, int numOfSequences, int option, int testNameID);
@@ -61,7 +61,7 @@ main(int argc, char *argv[])
 	int		i;
 	int		option;			/* TEMPLATE LENGTH/STREAM LENGTH/GENERATOR*/
 	char	*streamFile;	/* STREAM FILENAME     */
-	
+
 
 	if ( argc != 2 ) {
 		printf("Usage: %s <stream length>\n", argv[0]);
@@ -76,6 +76,7 @@ main(int argc, char *argv[])
 	tp.approximateEntropyBlockLength = 10;
 	tp.serialBlockLength = 16;
 	tp.linearComplexitySequenceLength = 500;
+	tp.gamblerRunsPerStartingPoint = 1000;
 	tp.numOfBitStreams = 1;
 	option = generatorOptions(&streamFile);
 	chooseTests();
@@ -89,9 +90,9 @@ main(int argc, char *argv[])
 		if ( results[i] != NULL )
 			fclose(results[i]);
 	}
-	if ( (testVector[0] == 1) || (testVector[TEST_CUSUM] == 1) ) 
+	if ( (testVector[0] == 1) || (testVector[TEST_CUSUM] == 1) )
 		partitionResultFile(2, tp.numOfBitStreams, option, TEST_CUSUM);
-	if ( (testVector[0] == 1) || (testVector[TEST_NONPERIODIC] == 1) ) 
+	if ( (testVector[0] == 1) || (testVector[TEST_NONPERIODIC] == 1) )
 		partitionResultFile(MAXNUMOFTEMPLATES, tp.numOfBitStreams, option, TEST_NONPERIODIC);
 	if ( (testVector[0] == 1) || (testVector[TEST_RND_EXCURSION] == 1) )
 		partitionResultFile(8, tp.numOfBitStreams, option, TEST_RND_EXCURSION);
@@ -114,25 +115,25 @@ main(int argc, char *argv[])
 
 void
 partitionResultFile(int numOfFiles, int numOfSequences, int option, int testNameID)
-{ 
+{
 	int		i, k, m, j, start, end, num, numread;
 	float	c;
 	FILE	**fp = (FILE **)calloc(numOfFiles+1, sizeof(FILE *));
 	int		*results = (int *)calloc(numOfFiles, sizeof(int *));
 	char	*s[MAXFILESPERMITTEDFORPARTITION];
 	char	resultsDir[200];
-	
+
 	for ( i=0; i<MAXFILESPERMITTEDFORPARTITION; i++ )
 		s[i] = (char*)calloc(200, sizeof(char));
-	
+
 	sprintf(resultsDir, "experiments/%s/%s/results.txt", generatorDir[option], testNames[testNameID]);
-	
+
 	if ( (fp[numOfFiles] = fopen(resultsDir, "r")) == NULL ) {
 		printf("%s", resultsDir);
 		printf(" -- file not found. Exiting program.\n");
 		exit(-1);
 	}
-	
+
 	for ( i=0; i<numOfFiles; i++ ) {
 		if ( i < 10 )
 			sprintf(s[i], "experiments/%s/%s/data%1d.txt", generatorDir[option], testNames[testNameID], i+1);
@@ -155,12 +156,12 @@ partitionResultFile(int numOfFiles, int numOfSequences, int option, int testName
 	}
 	for ( num=0; num<numOfSequences; num++ ) {
 		for ( k=0; k<m; k++ ) { 			/* FOR EACH BATCH */
-			
+
 			start = k*20;		/* BOUNDARY SEGMENTS */
 			end   = k*20+19;
 			if ( k == (m-1) )
 				end = numOfFiles-1;
-			
+
 			for ( i=start; i<=end; i++ ) {		/* OPEN FILE */
 				if ( (fp[i] = fopen(s[i], "a")) == NULL ) {
 					printf("%s", s[i]);
@@ -168,7 +169,7 @@ partitionResultFile(int numOfFiles, int numOfSequences, int option, int testName
 					exit(-1);
 				}
 			}
-			
+
 			for ( j=start; j<=end; j++ ) {		/* POPULATE FILE */
 				fscanf(fp[numOfFiles], "%f", &c);
 				fprintf(fp[j], "%f\n", c);
@@ -182,6 +183,9 @@ partitionResultFile(int numOfFiles, int numOfSequences, int option, int testName
 	fclose(fp[numOfFiles]);
 	for ( i=0; i<MAXFILESPERMITTEDFORPARTITION; i++ )
 		free(s[i]);
+
+	free(fp);
+	free(results);
 
 	return;
 }
@@ -203,21 +207,21 @@ postProcessResults(int option)
 	int		passRate, case1, case2, numOfFiles = 2;
 	double	p_hat;
 	char	s[200];
-	
+
 	for ( i=1; i<=NUMOFTESTS; i++ ) {		// FOR EACH TEST
 		if ( testVector[i] ) {
 			// SPECIAL CASES -- HANDLING MULTIPLE FILES FOR A SINGLE TEST
 			if ( ((i == TEST_CUSUM) && testVector[TEST_CUSUM] ) ||
 				 ((i == TEST_NONPERIODIC) && testVector[TEST_NONPERIODIC] ) ||
 				 ((i == TEST_RND_EXCURSION) && testVector[TEST_RND_EXCURSION]) ||
-				 ((i == TEST_RND_EXCURSION_VAR) && testVector[TEST_RND_EXCURSION_VAR]) || 
+				 ((i == TEST_RND_EXCURSION_VAR) && testVector[TEST_RND_EXCURSION_VAR]) ||
 				 ((i == TEST_SERIAL) && testVector[TEST_SERIAL]) ) {
-				
-				if ( (i == TEST_NONPERIODIC) && testVector[TEST_NONPERIODIC] )  
+
+				if ( (i == TEST_NONPERIODIC) && testVector[TEST_NONPERIODIC] )
 					numOfFiles = MAXNUMOFTEMPLATES;
-				else if ( (i == TEST_RND_EXCURSION) && testVector[TEST_RND_EXCURSION] ) 
+				else if ( (i == TEST_RND_EXCURSION) && testVector[TEST_RND_EXCURSION] )
 					numOfFiles = 8;
-				else if ( (i == TEST_RND_EXCURSION_VAR) && testVector[TEST_RND_EXCURSION_VAR] ) 
+				else if ( (i == TEST_RND_EXCURSION_VAR) && testVector[TEST_RND_EXCURSION_VAR] )
 					numOfFiles = 18;
 				else
 					numOfFiles = 2;
@@ -228,7 +232,7 @@ postProcessResults(int option)
 						sprintf(s, "experiments/%s/%s/data%2d.txt", generatorDir[option], testNames[i], k+1);
 					else
 						sprintf(s, "experiments/%s/%s/data%3d.txt", generatorDir[option], testNames[i], k+1);
-					if ( (i == TEST_RND_EXCURSION) || (i == TEST_RND_EXCURSION_VAR) ) 
+					if ( (i == TEST_RND_EXCURSION) || (i == TEST_RND_EXCURSION_VAR) )
 						randomExcursionSampleSize = computeMetrics(s,i);
 					else
 						generalSampleSize = computeMetrics(s,i);
@@ -244,7 +248,7 @@ postProcessResults(int option)
 	fprintf(summary, "\n\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
 	case1 = 0;
 	case2 = 0;
-	if ( testVector[TEST_RND_EXCURSION] || testVector[TEST_RND_EXCURSION_VAR] ) 
+	if ( testVector[TEST_RND_EXCURSION] || testVector[TEST_RND_EXCURSION_VAR] )
 		case2 = 1;
 	for ( i=1; i<=NUMOFTESTS; i++ ) {
 		if ( testVector[i] && (i != TEST_RND_EXCURSION) && (i != TEST_RND_EXCURSION_VAR) ) {
@@ -287,23 +291,25 @@ computeMetrics(char *s, int test)
 	double	*A, *T, chi2, proportion, uniformity, p_hat, tmp;
 	float	c;
 	FILE	*fp;
-	
+
 	if ( (fp = fopen(s, "r")) == NULL ) {
 		printf("%s",s);
 		printf(" -- file not found. Exiting program.\n");
 		exit(-1);
 	}
-	
+
+	/*
 	if ( (A = (double *)calloc(tp.numOfBitStreams, sizeof(double))) == NULL ) {
 		printf("Final Analysis Report aborted due to insufficient workspace\n");
 		return 0;
 	}
-	
+	*/
+
 	/* Compute Metric 1: Proportion of Passing Sequences */
-	
-	count = 0; 		
+
+	count = 0;
 	sampleSize = tp.numOfBitStreams;
-	
+
 	if ( (test == TEST_RND_EXCURSION) || (test == TEST_RND_EXCURSION_VAR) ) { /* Special Case: Random Excursion Tests */
 		if ( (T = (double *)calloc(tp.numOfBitStreams, sizeof(double))) == NULL ) {
 			printf("Final Analysis Report aborted due to insufficient workspace\n");
@@ -314,15 +320,15 @@ computeMetrics(char *s, int test)
 			if ( c > 0.000000 )
 				T[count++] = c;
 		}
-		
+
 		if ( (A = (double *)calloc(count, sizeof(double))) == NULL ) {
 			printf("Final Analysis Report aborted due to insufficient workspace\n");
 			return 0;
 		}
-		
+
 		for ( j=0; j<count; j++ )
 			A[j] = T[j];
-		
+
 		sampleSize = count;
 		count = 0;
 		for ( j=0; j<sampleSize; j++ )
@@ -346,13 +352,13 @@ computeMetrics(char *s, int test)
 		passCount = 0;
 	else
 		passCount = sampleSize - count;
-	
+
 	p_hat = 1.0 - ALPHA;
 	proportion_threshold_max = (p_hat + 3.0 * sqrt((p_hat*ALPHA)/sampleSize)) * sampleSize;
 	proportion_threshold_min = (p_hat - 3.0 * sqrt((p_hat*ALPHA)/sampleSize)) * sampleSize;
-	
+
 	/* Compute Metric 2: Histogram */
-	
+
 	qsort((void *)A, sampleSize, sizeof(double), (void *)cmp);
 	for ( j=0; j<sampleSize; j++ ) {
 		pos = (int)floor(A[j]*10);
@@ -369,17 +375,17 @@ computeMetrics(char *s, int test)
 			chi2 += pow(freqPerBin[j]-expCount, 2)/expCount;
 		uniformity = cephes_igamc(9.0/2.0, chi2/2.0);
 	}
-	
+
 	for ( j=0; j<10; j++ )			/* DISPLAY RESULTS */
 		fprintf(summary, "%3d ", freqPerBin[j]);
-	
+
 	if ( expCount == 0 )
 		fprintf(summary, "    ----    ");
 	else if ( uniformity < 0.0001 )
 		fprintf(summary, " %8.6f * ", uniformity);
 	else
 		fprintf(summary, " %8.6f   ", uniformity);
-	
+
 	if ( sampleSize == 0 )
 		fprintf(summary, " ------     %s\n", testNames[test]);
 	//	else if ( proportion < 0.96 )
@@ -387,9 +393,9 @@ computeMetrics(char *s, int test)
 		fprintf(summary, "%4d/%-4d *  %s\n", passCount, sampleSize, testNames[test]);
 	else
 		fprintf(summary, "%4d/%-4d    %s\n", passCount, sampleSize, testNames[test]);
-	
+
 	fclose(fp);
 	free(A);
-	
+
 	return sampleSize;
 }
