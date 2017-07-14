@@ -10,7 +10,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
  // Number of states/total capital
-#define N 129
+#define N 33
 
 #ifndef USE_BIT_TRACKER
 #define USE_BIT_TRACKER 1
@@ -28,6 +28,8 @@ bool
 next_bit(stream_state* state)
 {
 	bool bit = state->seq[state->pos++];
+
+	//fprintf(stderr, "%d", bit);
 
 	if ( state->pos == state->max )
 	{
@@ -237,9 +239,10 @@ run_gambler(stream_state* st, unsigned s, uint64_t* p, uint64_t* w_out, uint64_t
 	while ( i > 0 && i < N )
 	{
 		#if USE_BIT_TRACKER == 1
-		bool step = bit_track(p[i], st);
+		// Negate the result of bit_track : result 0 suggests value < p;
+		bool step = !bit_track(p[i], st);
 		#else
-		bool step = (p[i] <= next_u64(st));
+		bool step = (next_u64(st) < p[i]);
 		#endif
 
 		if ( step )
@@ -252,6 +255,8 @@ run_gambler(stream_state* st, unsigned s, uint64_t* p, uint64_t* w_out, uint64_t
 		}
 		++l;
 	}
+
+	//fprintf(stderr, "Game from starting point %d was %s. Game length: %zd\n", s, i == N ? "won" : "lost", l);
 
 	if ( i == N )
 		++(*w_out);
@@ -290,8 +295,8 @@ print_statistics(unsigned M, double *EXs, uint64_t *Xs, double *ETs, double *VTs
 	unsigned s;
 	double X, T, Y, sigma2, cdf, cdfc, p_value;
 
-	fprintf(stats[TEST_GAMBLER], "\t\tWin probablilities:\n");
-	// Win probablility
+	fprintf(stats[TEST_GAMBLER], "\t\tWin probabilities:\n");
+	// Win probability
 	for ( s = 1; s < N; ++s )
 	{
 		// Compute variance of the distribution and the actual variable Y
@@ -355,27 +360,27 @@ Gambler(int M, int n)
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
 	fprintf(stats[TEST_GAMBLER], "\t\tNo. of next_bit wraps: %d                    \n", st.wraps);
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
-	fprintf(stats[TEST_GAMBLER], "\t\tT1                                           \n");
+	fprintf(stats[TEST_GAMBLER], "\t\tT1 :                                         \n");
 	for ( s = 1; s < N; ++s ) {
 		fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
 		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W1[s], (double)W1[s]/M, T1e[s]);
 		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L1[s], (double)L1[s]/M, T1le[s]);
 	}
-	fprintf(stats[TEST_GAMBLER], "\t\tT2                                           \n");
+	fprintf(stats[TEST_GAMBLER], "\t\tT2 :                                         \n");
 	for ( s = 1; s < N; ++s ) {
 		fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
 		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W2[s], (double)W2[s]/M, T2e[s]);
 		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L2[s], (double)L2[s]/M, T2le[s]);
 	}
-	fprintf(stats[TEST_GAMBLER], "\t\tT3                                           \n");
+	fprintf(stats[TEST_GAMBLER], "\t\tT3 :                                         \n");
 	for ( s = 1; s < N; ++s ) {
 		fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
 		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W3[s], (double)W3[s]/M, T3e[s]);
 		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L3[s], (double)L3[s]/M, T3le[s]);
 	}
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
-	print_statistics(M, T1e, W1, T1le, T1lv, L1);
 
-	//fprintf(stats[TEST_GAMBLER], "%s\t\tp_value = %f\n\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", p_value); fflush(stats[TEST_GAMBLER]);
-	//fprintf(results[TEST_GAMBLER], "%f\n", p_value); fflush(results[TEST_GAMBLER]);
+	print_statistics(M, T1e, W1, T1le, T1lv, L1);
+	print_statistics(M, T2e, W2, T2le, T2lv, L2);
+	print_statistics(M, T3e, W3, T3le, T3lv, L3);
 }

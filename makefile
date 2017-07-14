@@ -95,3 +95,6 @@ clean:
 	rm -f assess $(OBJDIR)/*.o
 
 rebuild: clean assess
+
+dirs:
+	cd experiments && bash create-dir-script
