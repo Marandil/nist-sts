@@ -10,7 +10,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
  // Number of states/total capital
-#define N 33
+#define N 129
 
 #ifndef USE_BIT_TRACKER
 #define USE_BIT_TRACKER 1
@@ -239,7 +239,7 @@ run_gambler(stream_state* st, unsigned s, uint64_t* p, uint64_t* w_out, uint64_t
 		#if USE_BIT_TRACKER == 1
 		bool step = bit_track(p[i], st);
 		#else
-		bool step = (next_u64(st) < p[i]);
+		bool step = (p[i] <= next_u64(st));
 		#endif
 
 		if ( step )
@@ -288,21 +288,22 @@ print_statistics(unsigned M, double *EXs, uint64_t *Xs, double *ETs, double *VTs
 {
 	// For each starting point s
 	unsigned s;
-	double X, T, arg, sigma, cdf, cdfc, p_value;
+	double X, T, Y, sigma2, cdf, cdfc, p_value;
 
 	fprintf(stats[TEST_GAMBLER], "\t\tWin probablilities:\n");
 	// Win probablility
 	for ( s = 1; s < N; ++s )
 	{
-		// Compute actual variable X and variance of the distribution
-		sigma = EXs[s] * (1 - EXs[s]);
-		X = (double)(Xs[s]) / M;
-		arg = (X - EXs[s]) / sigma;
-		cdf = cephes_normal(arg);
+		// Compute variance of the distribution and the actual variable Y
+		sigma2 = EXs[s] * (1 - EXs[s]);
+		X = (double)(Xs[s]);
+		Y = (X - M * EXs[s]) / sqrt(M * sigma2);
+		// Compute CDF and P-Values
+		cdf = cephes_normal(Y);
 		cdfc = 1 - cdf;
 		p_value = cdf < cdfc ? cdf : cdfc;
 
-		fprintf(stats[TEST_GAMBLER], "%s\t\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", p_value); fflush(stats[TEST_GAMBLER]);
+		fprintf(stats[TEST_GAMBLER], "%s\t\tY = %f\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", Y, p_value); fflush(stats[TEST_GAMBLER]);
 		fprintf(results[TEST_GAMBLER], "%f\n", p_value); fflush(results[TEST_GAMBLER]);
 	}
 
@@ -310,14 +311,16 @@ print_statistics(unsigned M, double *EXs, uint64_t *Xs, double *ETs, double *VTs
 	// Game duration
 	for ( s = 1; s < N; ++s )
 	{
-		// Compute actual variable T and variance of the distribution
-		T = (double)(Ts[s]) / M;
-		arg = (T - ETs[s]) / VTs[s];
-		cdf = cephes_normal(arg);
+		// Compute the actual variable Y
+		sigma2 = VTs[s];
+		T = (double)(Ts[s]);
+		Y = (T - M * ETs[s]) / sqrt(M * sigma2);
+		// Compute CDF and P-Values
+		cdf = cephes_normal(Y);
 		cdfc = 1 - cdf;
 		p_value = cdf < cdfc ? cdf : cdfc;
 
-		fprintf(stats[TEST_GAMBLER], "%s\t\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", p_value); fflush(stats[TEST_GAMBLER]);
+		fprintf(stats[TEST_GAMBLER], "%s\t\tY = %f\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", Y, p_value); fflush(stats[TEST_GAMBLER]);
 		fprintf(results[TEST_GAMBLER], "%f\n", p_value); fflush(results[TEST_GAMBLER]);
 	}
 }
@@ -337,9 +340,9 @@ Gambler(int M, int n)
 	{
 		for ( c = M; c > 0; --c )
 		{
-			run_gambler(&st, s, T1, W1+s, L1+s);
-			run_gambler(&st, s, T2, W2+s, L2+s);
-			run_gambler(&st, s, T3, W3+s, L3+s);
+			run_gambler(&st, s, T1, &W1[s], &L1[s]);
+			run_gambler(&st, s, T2, &W2[s], &L2[s]);
+			run_gambler(&st, s, T3, &W3[s], &L3[s]);
 		}
 	}
 
