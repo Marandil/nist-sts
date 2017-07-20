@@ -10,7 +10,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
  // Number of states/total capital
-#define N 33
+#define N 129
 
 #ifndef USE_BIT_TRACKER
 #define USE_BIT_TRACKER 1
@@ -65,8 +65,8 @@ next_u64(stream_state* state)
 bool
 bit_track(uint64_t split, stream_state* state)
 {
-	uint64_t mask = 0x8000000000000000ull;
-	uint64_t left = 0x0000000000000000ull;
+	uint64_t mask  = 0x8000000000000000ull;
+	uint64_t left  = 0x0000000000000000ull;
 	uint64_t right = 0xffffffffffffffffull;
 	do {
 		bool bit = next_bit(state);
