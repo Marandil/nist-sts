@@ -10,7 +10,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
  // Number of states/total capital
-#define N 129
+#define N 33
 
 #ifndef USE_BIT_TRACKER
 #define USE_BIT_TRACKER 1
@@ -310,9 +310,7 @@ print_statistics(unsigned M, double *EXs, uint64_t *Xs, double *ETs, double *VTs
 		X = (double)(Xs[s]);
 		Y = (X - M * EXs[s]) / sqrt(M * sigma2);
 		// Compute CDF and P-Values
-		cdf = cephes_normal(Y);
-		cdfc = 1 - cdf;
-		p_value = cdf < cdfc ? cdf : cdfc;
+		p_value = 2*(1-cephes_normal(fabs(Y)));
 
 		fprintf(stats[TEST_GAMBLER], "%s\t\tY = %f\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", Y, p_value); fflush(stats[TEST_GAMBLER]);
 		fprintf(results[TEST_GAMBLER], "%f\n", p_value); fflush(results[TEST_GAMBLER]);
@@ -327,9 +325,7 @@ print_statistics(unsigned M, double *EXs, uint64_t *Xs, double *ETs, double *VTs
 		T = (double)(Ts[s]);
 		Y = (T - M * ETs[s]) / sqrt(M * sigma2);
 		// Compute CDF and P-Values
-		cdf = cephes_normal(Y);
-		cdfc = 1 - cdf;
-		p_value = cdf < cdfc ? cdf : cdfc;
+		p_value = 2*(1-cephes_normal(fabs(Y)));
 
 		fprintf(stats[TEST_GAMBLER], "%s\t\tY = %f\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", Y, p_value); fflush(stats[TEST_GAMBLER]);
 		fprintf(results[TEST_GAMBLER], "%f\n", p_value); fflush(results[TEST_GAMBLER]);
