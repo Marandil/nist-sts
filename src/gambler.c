@@ -88,7 +88,9 @@ uint64_t
 frac_to_fixed(uint64_t nom, uint64_t den)
 {
 	uint64_t r = 0;
-	for ( unsigned i=64; i > 0; --i )
+	unsigned i;
+
+	for ( i=64; i > 0; --i )
 	{
 		nom <<= 1;
 		r <<= 1;
@@ -182,8 +184,10 @@ init_arrays ()
 	static bool done = false;
 	if ( done ) return;
 
+	unsigned i, s;
+
 	// For all possible points i:
-	for ( unsigned i = 1; i < N; ++i )
+	for ( i = 1; i < N; ++i )
 	{
 		// Compute different fracs for winning probabilities
 		T1[i] = frac_to_fixed(48, 100);
@@ -199,7 +203,7 @@ init_arrays ()
 		double r = q / p;
 
 		double d = (1 - pow(r, N));
-		for ( unsigned s = 1; s < N; ++s )
+		for ( s = 1; s < N; ++s )
 		{
 			T1e[s] = (1 - pow(r, s)) / d;
 		}
@@ -209,7 +213,7 @@ init_arrays ()
 	// T2
 	{
 		double d = N * (N + 1);
-		for ( unsigned s = 1; s < N; ++s )
+		for ( s = 1; s < N; ++s )
 		{
 			T2e[s] = (double)(s * (s+1)) / d;
 		}
@@ -219,7 +223,7 @@ init_arrays ()
 	// T3
 	{
 		double d = N * N * (N + 1) * (N + 1);
-		for ( unsigned s = 1; s < N; ++s )
+		for ( s = 1; s < N; ++s )
 		{
 			T3e[s] = (double)(s * s * (s+1) * (s+1)) / d;
 		}
@@ -277,7 +281,9 @@ uint64_t L3[N];
 void
 zero_arrays()
 {
-	for ( unsigned i=0; i < N; ++i )
+	unsigned i;
+
+	for ( i=0; i < N; ++i )
 	{
 		W1[i] = 0;
 		W2[i] = 0;
