@@ -16,6 +16,10 @@
 #define USE_BIT_TRACKER 1
 #endif
 
+#define MASK_T1 0x01
+#define MASK_T2 0x02
+#define MASK_T3 0x04
+
 typedef struct
 {
 	BitSequence* seq;
@@ -295,15 +299,17 @@ zero_arrays()
 }
 
 void
-print_statistics(unsigned M, double *EXs, uint64_t *Xs, double *ETs, double *VTs, uint64_t *Ts)
+print_statistics(unsigned M,
+	               double *EXs, uint64_t *Xs, double *ETs, double *VTs, uint64_t *Ts,
+								 unsigned s_start, unsigned s_end)
 {
 	// For each starting point s
 	unsigned s;
-	double X, T, Y, sigma2, cdf, cdfc, p_value;
+	double X, T, Y, sigma2, p_value;
 
 	fprintf(stats[TEST_GAMBLER], "\t\tWin probabilities:\n");
 	// Win probability
-	for ( s = 1; s < N; ++s )
+	for ( s = s_start; s <= s_end; ++s )
 	{
 		// Compute variance of the distribution and the actual variable Y
 		sigma2 = EXs[s] * (1 - EXs[s]);
@@ -318,7 +324,7 @@ print_statistics(unsigned M, double *EXs, uint64_t *Xs, double *ETs, double *VTs
 
 	fprintf(stats[TEST_GAMBLER], "\t\tGame durations:\n");
 	// Game duration
-	for ( s = 1; s < N; ++s )
+	for ( s = s_start; s <= s_end; ++s )
 	{
 		// Compute the actual variable Y
 		sigma2 = VTs[s];
@@ -332,9 +338,10 @@ print_statistics(unsigned M, double *EXs, uint64_t *Xs, double *ETs, double *VTs
 	}
 }
 
+unsigned int GAMBLER_NUM_OF_FILES;
 
 void
-Gambler(int M, int n)
+Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 {
 	stream_state st = { epsilon, 0, n, 0 };
 	unsigned s, c;
@@ -342,14 +349,33 @@ Gambler(int M, int n)
 	init_arrays();
 	zero_arrays();
 
+	// Sanitize start/end points
+	if ( s_start < 1)
+		s_start = 1;
+	if ( s_end < s_start || s_end >= N )
+		s_end = N - 1;
+
+	// Compute the total number of files produced, that is number of p-values per
+	// test.
+	GAMBLER_NUM_OF_FILES = (s_end - s_start + 1)
+	                     * ( ((test_mask >> 0) & 1)
+										      +((test_mask >> 1) & 1)
+ 										      +((test_mask >> 2) & 1) )
+											 * 2;
+
+  fprintf(stderr, "start: %d end: %d GAMBLER_NUM_OF_FILES: %d\n", s_start, s_end, GAMBLER_NUM_OF_FILES);
+
 	// For each starting point, run gambler simulator for stream_state and T table
-	for ( s = 1; s < N; ++s )
+	for ( s = s_start; s <= s_end; ++s )
 	{
 		for ( c = M; c > 0; --c )
 		{
-			run_gambler(&st, s, T1, &W1[s], &L1[s]);
-			run_gambler(&st, s, T2, &W2[s], &L2[s]);
-			run_gambler(&st, s, T3, &W3[s], &L3[s]);
+			if(test_mask & MASK_T1)
+				run_gambler(&st, s, T1, &W1[s], &L1[s]);
+			if(test_mask & MASK_T2)
+				run_gambler(&st, s, T2, &W2[s], &L2[s]);
+			if(test_mask & MASK_T3)
+				run_gambler(&st, s, T3, &W3[s], &L3[s]);
 		}
 	}
 
@@ -362,27 +388,39 @@ Gambler(int M, int n)
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
 	fprintf(stats[TEST_GAMBLER], "\t\tNo. of next_bit wraps: %d                    \n", st.wraps);
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
-	fprintf(stats[TEST_GAMBLER], "\t\tT1 :                                         \n");
-	for ( s = 1; s < N; ++s ) {
-		fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
-		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W1[s], (double)W1[s]/M, T1e[s]);
-		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L1[s], (double)L1[s]/M, T1le[s]);
+	if(test_mask & MASK_T1)
+	{
+		fprintf(stats[TEST_GAMBLER], "\t\tT1 :                                         \n");
+		for ( s = s_start; s <= s_end; ++s )
+		{
+			fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
+			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W1[s], (double)W1[s]/M, T1e[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L1[s], (double)L1[s]/M, T1le[s]);
+		}
+		print_statistics(M, T1e, W1, T1le, T1lv, L1, s_start, s_end);
 	}
-	fprintf(stats[TEST_GAMBLER], "\t\tT2 :                                         \n");
-	for ( s = 1; s < N; ++s ) {
-		fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
-		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W2[s], (double)W2[s]/M, T2e[s]);
-		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L2[s], (double)L2[s]/M, T2le[s]);
+	if(test_mask & MASK_T2)
+	{
+		fprintf(stats[TEST_GAMBLER], "\t\tT2 :                                         \n");
+		for ( s = s_start; s <= s_end; ++s )
+		{
+			fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
+			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W2[s], (double)W2[s]/M, T2e[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L2[s], (double)L2[s]/M, T2le[s]);
+		}
+		print_statistics(M, T2e, W2, T2le, T2lv, L2, s_start, s_end);
 	}
-	fprintf(stats[TEST_GAMBLER], "\t\tT3 :                                         \n");
-	for ( s = 1; s < N; ++s ) {
-		fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
-		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W3[s], (double)W3[s]/M, T3e[s]);
-		fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L3[s], (double)L3[s]/M, T3le[s]);
+	if(test_mask & MASK_T3)
+	{
+		fprintf(stats[TEST_GAMBLER], "\t\tT3 :                                         \n");
+		for ( s = s_start; s <= s_end; ++s )
+		{
+			fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
+			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W3[s], (double)W3[s]/M, T3e[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L3[s], (double)L3[s]/M, T3le[s]);
+		}
+		print_statistics(M, T3e, W3, T3le, T3lv, L3, s_start, s_end);
 	}
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
 
-	print_statistics(M, T1e, W1, T1le, T1lv, L1);
-	print_statistics(M, T2e, W2, T2le, T2lv, L2);
-	print_statistics(M, T3e, W3, T3le, T3lv, L3);
 }

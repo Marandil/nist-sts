@@ -163,7 +163,12 @@ fixParameters()
 		if ( testVector[TEST_LINEARCOMPLEXITY] == 1 )
 			printf("    [%d] Linear Complexity Test - block length(M):       %d\n", counter++, tp.linearComplexitySequenceLength);
 		if ( testVector[TEST_GAMBLER] == 1 )
+		{
 			printf("    [%d] Gambler - runs per starting point(M):           %d\n", counter++, tp.gamblerRunsPerStartingPoint);
+			printf("                  first starting point (s_start):       %d\n", tp.gamblerStartStartingPoint);
+			printf("                  last starting point (s_end):          %d\n", tp.gamblerEndStartingPoint);
+			printf("                  test mask (mask):                     %d\n", tp.gamblerTestMask);
+		}
 		printf("\n");
 		printf("   Select Test (0 to continue): ");
 		safe_scanf("%1d", &testid);
@@ -227,8 +232,22 @@ fixParameters()
 		if ( testVector[TEST_GAMBLER] == 1 ) {
 			counter++;
 			if ( counter == testid ) {
+				printf("         Last starting point == 0 equals the last possible\n");
+				printf("         Test mask is a bit mask: T1 - 1\n");
+				printf("                                  T2 - 2\n");
+				printf("                                  T3 - 4\n");
+
 				printf("   Enter number of runs per Gambler's starting point: ");
 				safe_scanf("%d", &tp.gamblerRunsPerStartingPoint);
+				printf("\n");
+				printf("   Enter the first Gambler's starting point: ");
+				safe_scanf("%d", &tp.gamblerStartStartingPoint);
+				printf("\n");
+				printf("   Enter the last Gambler's starting point: ");
+				safe_scanf("%d", &tp.gamblerEndStartingPoint);
+				printf("\n");
+				printf("   Enter the Gambler's test bit mask: ");
+				safe_scanf("%d", &tp.gamblerTestMask);
 				printf("\n");
 				continue;
 			}
@@ -521,5 +540,6 @@ nist_test_suite()
 		LinearComplexity(tp.linearComplexitySequenceLength, tp.n);
 
 	if ( (testVector[0] == 1) || (testVector[TEST_GAMBLER] == 1) )
-		Gambler(tp.gamblerRunsPerStartingPoint, tp.n);
+		Gambler(tp.gamblerRunsPerStartingPoint, tp.n, tp.gamblerStartStartingPoint,
+			      tp.gamblerEndStartingPoint, tp.gamblerTestMask);
 }

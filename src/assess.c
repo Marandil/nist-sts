@@ -42,6 +42,7 @@
                   of the supporting documentation for such software.
    -------------------------------------------------------------------------- */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -77,6 +78,9 @@ main(int argc, char *argv[])
 	tp.serialBlockLength = 16;
 	tp.linearComplexitySequenceLength = 500;
 	tp.gamblerRunsPerStartingPoint = 1000;
+	tp.gamblerStartStartingPoint = 1;
+	tp.gamblerEndStartingPoint = 0;
+	tp.gamblerTestMask = 7;
 	tp.numOfBitStreams = 1;
 	option = generatorOptions(&streamFile);
 	chooseTests();
@@ -100,6 +104,8 @@ main(int argc, char *argv[])
 		partitionResultFile(18, tp.numOfBitStreams, option, TEST_RND_EXCURSION_VAR);
 	if ( (testVector[0] == 1) || (testVector[TEST_SERIAL] == 1) )
 		partitionResultFile(2, tp.numOfBitStreams, option, TEST_SERIAL);
+	if ( (testVector[0] == 1) || (testVector[TEST_GAMBLER] == 1) )
+		partitionResultFile(GAMBLER_NUM_OF_FILES, tp.numOfBitStreams, option, TEST_GAMBLER);
 	fprintf(summary, "------------------------------------------------------------------------------\n");
 	fprintf(summary, "RESULTS FOR THE UNIFORMITY OF P-VALUES AND THE PROPORTION OF PASSING SEQUENCES\n");
 	fprintf(summary, "------------------------------------------------------------------------------\n");
@@ -120,11 +126,17 @@ partitionResultFile(int numOfFiles, int numOfSequences, int option, int testName
 	float	c;
 	FILE	**fp = (FILE **)calloc(numOfFiles+1, sizeof(FILE *));
 	int		*results = (int *)calloc(numOfFiles, sizeof(int *));
-	char	*s[MAXFILESPERMITTEDFORPARTITION];
+	char	**s = (char**)calloc(numOfFiles, sizeof(char *));
 	char	resultsDir[200];
 
-	for ( i=0; i<MAXFILESPERMITTEDFORPARTITION; i++ )
+	assert(fp != NULL);
+	assert(results != NULL);
+	assert(s != NULL);
+
+	for ( i=0; i<numOfFiles; i++ ) {
 		s[i] = (char*)calloc(200, sizeof(char));
+		assert(s[i] != NULL);
+	}
 
 	sprintf(resultsDir, "experiments/%s/%s/results.txt", generatorDir[option], testNames[testNameID]);
 
@@ -181,9 +193,10 @@ partitionResultFile(int numOfFiles, int numOfSequences, int option, int testName
 		}
 	}
 	fclose(fp[numOfFiles]);
-	for ( i=0; i<MAXFILESPERMITTEDFORPARTITION; i++ )
+	for ( i=0; i<numOfFiles; i++ )
 		free(s[i]);
 
+	free(s);
 	free(fp);
 	free(results);
 
@@ -215,7 +228,8 @@ postProcessResults(int option)
 				 ((i == TEST_NONPERIODIC) && testVector[TEST_NONPERIODIC] ) ||
 				 ((i == TEST_RND_EXCURSION) && testVector[TEST_RND_EXCURSION]) ||
 				 ((i == TEST_RND_EXCURSION_VAR) && testVector[TEST_RND_EXCURSION_VAR]) ||
-				 ((i == TEST_SERIAL) && testVector[TEST_SERIAL]) ) {
+				 ((i == TEST_SERIAL) && testVector[TEST_SERIAL])  ||
+				 ((i == TEST_GAMBLER) && testVector[TEST_GAMBLER]) ) {
 
 				if ( (i == TEST_NONPERIODIC) && testVector[TEST_NONPERIODIC] )
 					numOfFiles = MAXNUMOFTEMPLATES;
@@ -223,8 +237,11 @@ postProcessResults(int option)
 					numOfFiles = 8;
 				else if ( (i == TEST_RND_EXCURSION_VAR) && testVector[TEST_RND_EXCURSION_VAR] )
 					numOfFiles = 18;
+				else if ( (i == TEST_GAMBLER) && testVector[TEST_GAMBLER] )
+					numOfFiles = GAMBLER_NUM_OF_FILES;
 				else
 					numOfFiles = 2;
+
 				for ( k=0; k<numOfFiles; k++ ) {
 					if ( k < 10 )
 						sprintf(s, "experiments/%s/%s/data%1d.txt", generatorDir[option], testNames[i], k+1);

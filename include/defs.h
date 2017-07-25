@@ -25,7 +25,7 @@
 #define MAXNUMOFTEMPLATES				148		/* APERIODIC TEMPLATES: 148=>temp_length=9 */
 #define NUMOFTESTS						16		/* MAX TESTS DEFINED  */
 #define NUMOFGENERATORS					10		/* MAX PRNGs */
-#define MAXFILESPERMITTEDFORPARTITION	148
+#define MAXFILESPERMITTEDFORPARTITION	4096
 #define	TEST_FREQUENCY					1
 #define	TEST_BLOCK_FREQUENCY			2
 #define	TEST_CUSUM						3
@@ -43,6 +43,8 @@
 #define	TEST_LINEARCOMPLEXITY			15
 #define	TEST_GAMBLER			16
 
+extern unsigned int GAMBLER_NUM_OF_FILES;
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
                    G L O B A L   D A T A  S T R U C T U R E S
@@ -59,5 +61,8 @@ typedef struct _testParameters {
 	int		linearComplexitySequenceLength;
 	int		approximateEntropyBlockLength;
 	int		gamblerRunsPerStartingPoint;
+	int		gamblerStartStartingPoint;
+	int		gamblerEndStartingPoint;
+	int		gamblerTestMask;
 	int		numOfBitStreams;
 } TP;
