@@ -25,7 +25,7 @@
 #define MAXNUMOFTEMPLATES				148		/* APERIODIC TEMPLATES: 148=>temp_length=9 */
 #define NUMOFTESTS						16		/* MAX TESTS DEFINED  */
 #define NUMOFGENERATORS					10		/* MAX PRNGs */
-#define MAXFILESPERMITTEDFORPARTITION	4096
+#define MAXFILEPATHLENGTH	4096
 #define	TEST_FREQUENCY					1
 #define	TEST_BLOCK_FREQUENCY			2
 #define	TEST_CUSUM						3
@@ -43,7 +43,9 @@
 #define	TEST_LINEARCOMPLEXITY			15
 #define	TEST_GAMBLER			16
 
-extern unsigned int GAMBLER_NUM_OF_FILES;
+extern unsigned int GAMBLER_NUM_OF_FILES; /* Number of separate p-values produced
+                                             by the Gambler test */
+extern unsigned int GAMBLER_NUM_OF_TESTS; /* Number of Gambler tests run */
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

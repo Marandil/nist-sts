@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -10,7 +11,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
  // Number of states/total capital
-#define N 33
+#define N 129
 
 #ifndef USE_BIT_TRACKER
 #define USE_BIT_TRACKER 1
@@ -64,7 +65,7 @@ next_u64(stream_state* state)
 }
 #else
 /* A simplified version of BitTracker
-   will only split on 1 value instead on any number of them
+   will only split on 1 value instead of on any number of them
  */
 bool
 bit_track(uint64_t split, stream_state* state)
@@ -110,7 +111,7 @@ frac_to_fixed(uint64_t nom, uint64_t den)
 // Transition probabilities
 uint64_t T1[N]; // = 0.48
 uint64_t T2[N]; // = i / (2i+1)
-uint64_t T3[N]; // = (i^3)/(i^3+(i+1)^3)
+uint64_t T3[N]; // = (i^3) / (i^3+(i+1)^3)
 
 // Expected winning outcomes
 double T1e[N];
@@ -170,7 +171,8 @@ compute_times(uint64_t *prob, double *e_out, double *var_out)
 	{
 		e_out[i] = g[0] / h[0] * h[i] - g[i];
 		z[i] = 2 * (e_out[i] - 1) / p2d(-prob[i]);
-		// the variables below have slightly different indexing han g and h, i.e. v[N-1] corresponds to the v[N] from python code.
+		// the variables below have slightly different indexing than g and h,
+		// i.e. v[N-1] corresponds to the v[N] from Python code.
 		x[i] = x[i-1] + z[i] / d[i-1];
 		c[i] = c[i-1] + z[i] / d[i-1] * h[i];
 		v[i] = x[i] * h[(i+1)%N] - c[i];
@@ -339,6 +341,11 @@ print_statistics(unsigned M,
 }
 
 unsigned int GAMBLER_NUM_OF_FILES;
+unsigned int GAMBLER_NUM_OF_TESTS;
+
+static unsigned int GAMBLER_TEST_MASK;
+static unsigned int GAMBLER_S_START;
+static unsigned int GAMBLER_S_END;
 
 void
 Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
@@ -357,13 +364,15 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 
 	// Compute the total number of files produced, that is number of p-values per
 	// test.
+	GAMBLER_NUM_OF_TESTS = ((test_mask >> 0) & 1)
+											 + ((test_mask >> 1) & 1)
+											 + ((test_mask >> 2) & 1);
 	GAMBLER_NUM_OF_FILES = (s_end - s_start + 1)
-	                     * ( ((test_mask >> 0) & 1)
-										      +((test_mask >> 1) & 1)
- 										      +((test_mask >> 2) & 1) )
+	                     * GAMBLER_NUM_OF_TESTS
 											 * 2;
-
-  fprintf(stderr, "start: %d end: %d GAMBLER_NUM_OF_FILES: %d\n", s_start, s_end, GAMBLER_NUM_OF_FILES);
+	GAMBLER_TEST_MASK = test_mask;
+	GAMBLER_S_START = s_start;
+	GAMBLER_S_END = s_end;
 
 	// For each starting point, run gambler simulator for stream_state and T table
 	for ( s = s_start; s <= s_end; ++s )
@@ -423,4 +432,48 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 	}
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
 
+}
+
+char* GamblerNextTestName()
+{
+	/* Static initialization */
+	static idx = 0;
+	static char buffer[64];
+	static const char* GAMBLER_TEST_NAMES[3];
+	static const char* GAMBLER_TEST_TYPES[2] = { "Wins", "Type" };
+
+	static bool initialized = false;
+
+	unsigned t, type, range, s, test;
+
+	if ( !initialized ) {
+		t = 0;
+		if(GAMBLER_TEST_MASK & MASK_T1)
+			GAMBLER_TEST_NAMES[t++] = "T1";
+		if(GAMBLER_TEST_MASK & MASK_T2)
+			GAMBLER_TEST_NAMES[t++] = "T2";
+		if(GAMBLER_TEST_MASK & MASK_T3)
+			GAMBLER_TEST_NAMES[t++] = "T3";
+
+		initialized = true;
+		assert(GAMBLER_NUM_OF_TESTS == t);
+	}
+
+	/* The tests are printed out in orders: T1 Wins 0, T1 Wins 1, ..., T1 Time 0 ... */
+
+	range = GAMBLER_S_END - GAMBLER_S_START + 1;
+	s = idx % range + GAMBLER_S_START;
+	t = idx / range;
+
+	type = t % 2;
+	t = t / 2;
+
+	test = t;
+
+	sprintf(buffer, "Gambler %s (%s) %d", GAMBLER_TEST_NAMES[test],
+		GAMBLER_TEST_TYPES[type], s);
+
+	idx++;
+
+	return buffer;
 }

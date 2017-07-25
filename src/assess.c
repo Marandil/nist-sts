@@ -403,13 +403,20 @@ computeMetrics(char *s, int test)
 	else
 		fprintf(summary, " %8.6f   ", uniformity);
 
+	const char* testName;
+
+	if ( test == TEST_GAMBLER )
+		testName = GamblerNextTestName();
+	else
+		testName = testNames[test];
+
 	if ( sampleSize == 0 )
-		fprintf(summary, " ------     %s\n", testNames[test]);
+		fprintf(summary, " ------     %s\n", testName);
 	//	else if ( proportion < 0.96 )
 	else if ( (passCount < proportion_threshold_min) || (passCount > proportion_threshold_max))
-		fprintf(summary, "%4d/%-4d *  %s\n", passCount, sampleSize, testNames[test]);
+		fprintf(summary, "%4d/%-4d *  %s\n", passCount, sampleSize, testName);
 	else
-		fprintf(summary, "%4d/%-4d    %s\n", passCount, sampleSize, testNames[test]);
+		fprintf(summary, "%4d/%-4d    %s\n", passCount, sampleSize, testName);
 
 	fclose(fp);
 	free(A);
