@@ -362,7 +362,7 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 	if ( s_end < s_start || s_end >= N )
 		s_end = N - 1;
 
-	// Compute the total number of files produced, that is number of p-values per
+	// Compute the total number of files produced, that is the number of p-values per
 	// test.
 	GAMBLER_NUM_OF_TESTS = ((test_mask >> 0) & 1)
 											 + ((test_mask >> 1) & 1)
@@ -440,7 +440,7 @@ char* GamblerNextTestName()
 	static idx = 0;
 	static char buffer[64];
 	static const char* GAMBLER_TEST_NAMES[3];
-	static const char* GAMBLER_TEST_TYPES[2] = { "Wins", "Type" };
+	static const char* GAMBLER_TEST_TYPES[2] = { "Wins", "Time" };
 
 	static bool initialized = false;
 
