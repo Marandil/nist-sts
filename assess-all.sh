@@ -53,13 +53,16 @@ fi
 
 for GEN in $GENS; do
   CALL_PARAMS="$GEN $TESTS_ARGS $PARAMS $BITSTREAMS"
-  time ./assess $N 2>&1 1> assess-$GEN.log <<< "$CALL_PARAMS" &
+  echo $CALL_PARAMS
+  #time stdbuf -o0 ./assess $N 2>&1 1>assess-$GEN.log <<< "$CALL_PARAMS" &
 done
 
-#for GEN in $EX_GENS; do
-#  CALL_PARAMS="0 $GEN $TESTS_ARGS $PARAMS $BITSTREAMS"
-#  NAME=`echo $GEN | sed s@/@-@g | sed s@-sequence@@ | sed s@gambler-gens-seq-@@`
-#  time ./assess $N 2>&1 1> assess-$NAME.log <<< "$CALL_PARAMS"
-#done
+for GEN in $EX_GENS; do
+  CALL_PARAMS="0 $GEN $TESTS_ARGS $PARAMS $BITSTREAMS 1"
+  NAME=`echo $GEN | sed s@/@-@g | sed s@-sequence@@ | sed s@gambler-gens-seq-@@`
+  echo $CALL_PARAMS
+  time stdbuf -o0 ./assess $N 2>&1 1>assess-$NAME.log <<< "$CALL_PARAMS"
+  cp -r experiments/AlgorithmTesting{,-$NAME}
+done
 
 wait

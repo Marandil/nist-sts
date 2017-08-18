@@ -65,9 +65,10 @@ function generate # $1: index number
 	for GEN in $GENS; do
 		for KDF in $KDFS; do
 			FNAME="seq/$KDF/$GEN/$1"
-			./generator.sh $KDF $GEN $BLEN $1 > $FNAME
+			./generator.sh $KDF $GEN $BLEN $1 > $FNAME &
 		done
 	done
+	wait
 }
 
 function s_to_mm_ss # $1 seconds
