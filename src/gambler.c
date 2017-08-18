@@ -309,7 +309,7 @@ print_statistics(unsigned M,
 	unsigned s;
 	double X, T, Y, sigma2, p_value;
 
-	fprintf(stats[TEST_GAMBLER], "\t\tWin probabilities:\n");
+	//fprintf(stats[TEST_GAMBLER], "\t\tWin probabilities:\n");
 	// Win probability
 	for ( s = s_start; s <= s_end; ++s )
 	{
@@ -320,11 +320,11 @@ print_statistics(unsigned M,
 		// Compute CDF and P-Values
 		p_value = 2*(1-cephes_normal(fabs(Y)));
 
-		fprintf(stats[TEST_GAMBLER], "%s\t\tY = %f\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", Y, p_value); fflush(stats[TEST_GAMBLER]);
+		//fprintf(stats[TEST_GAMBLER], "%s\t\tY = %f\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", Y, p_value); fflush(stats[TEST_GAMBLER]);
 		fprintf(results[TEST_GAMBLER], "%f\n", p_value); fflush(results[TEST_GAMBLER]);
 	}
 
-	fprintf(stats[TEST_GAMBLER], "\t\tGame durations:\n");
+	//fprintf(stats[TEST_GAMBLER], "\t\tGame durations:\n");
 	// Game duration
 	for ( s = s_start; s <= s_end; ++s )
 	{
@@ -335,7 +335,7 @@ print_statistics(unsigned M,
 		// Compute CDF and P-Values
 		p_value = 2*(1-cephes_normal(fabs(Y)));
 
-		fprintf(stats[TEST_GAMBLER], "%s\t\tY = %f\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", Y, p_value); fflush(stats[TEST_GAMBLER]);
+		//fprintf(stats[TEST_GAMBLER], "%s\t\tY = %f\tp_value = %f\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", Y, p_value); fflush(stats[TEST_GAMBLER]);
 		fprintf(results[TEST_GAMBLER], "%f\n", p_value); fflush(results[TEST_GAMBLER]);
 	}
 }
@@ -403,8 +403,8 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 		for ( s = s_start; s <= s_end; ++s )
 		{
 			fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
-			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W1[s], (double)W1[s]/M, T1e[s]);
-			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L1[s], (double)L1[s]/M, T1le[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\tT1;%d; (a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", s, W1[s], (double)W1[s]/M, T1e[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\tT1;%d; (b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", s, L1[s], (double)L1[s]/M, T1le[s]);
 		}
 		print_statistics(M, T1e, W1, T1le, T1lv, L1, s_start, s_end);
 	}
@@ -414,8 +414,8 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 		for ( s = s_start; s <= s_end; ++s )
 		{
 			fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
-			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W2[s], (double)W2[s]/M, T2e[s]);
-			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L2[s], (double)L2[s]/M, T2le[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\tT2;%d; (a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", s, W2[s], (double)W2[s]/M, T2e[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\tT2;%d; (b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", s, L2[s], (double)L2[s]/M, T2le[s]);
 		}
 		print_statistics(M, T2e, W2, T2le, T2lv, L2, s_start, s_end);
 	}
@@ -425,8 +425,8 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 		for ( s = s_start; s <= s_end; ++s )
 		{
 			fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
-			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", W3[s], (double)W3[s]/M, T3e[s]);
-			fprintf(stats[TEST_GAMBLER], "\t\t\t\t(b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", L3[s], (double)L3[s]/M, T3le[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\tT3;%d; (a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", s, W3[s], (double)W3[s]/M, T3e[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\tT3;%d; (b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", s, L3[s], (double)L3[s]/M, T3le[s]);
 		}
 		print_statistics(M, T3e, W3, T3le, T3lv, L3, s_start, s_end);
 	}

@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # Bit length of streams to be tested:
-N=$((32*1024*1024*8))  # 32 MB
+#N=$((32*1024*1024*8))  # 32 MB
+N=$((1024*8))          # 1 kB
 
-# List of generators to be tested
-# [0] Input File (unsupported)
+# List of built-in generators to be tested
+# [0] Input File (see below)
 # [1] Linear Congruential
 # [2] Quadratic Congruential I
 # [3] Quadratic Congruential II
@@ -15,6 +16,9 @@ N=$((32*1024*1024*8))  # 32 MB
 # [8] Micali-Schnorr
 # [9] G Using SHA-1
 GENS="1 2 3 4 5 6 7 8 9"
+
+# List of external generators to be tested
+EX_GENS=`ls gambler-gens/seq/*/*-sequence`
 
 # Set 0 if you only want to apply Gambler test
 # Set 1 if you want to apply all of them
@@ -35,7 +39,7 @@ IF0="0000000000000001"
 #  [4] Approximate Entropy Test - block length(m):     10
 #  [5] Serial Test - block length(m):                  16
 #  [6] Linear Complexity Test - block length(M):       500
-#  [7] Gambler - runs per starting point(M):           1000 
+#  [7] Gambler - runs per starting point(M):           1000
 
 PARAMS="0"
 
@@ -44,12 +48,18 @@ BITSTREAMS=1024
 
 TESTS_ARGS="$TESTS"
 if (( $TESTS == 0 )); then
-    TESTS_ARGS="$TESTS_ARGS $IF0"
+  TESTS_ARGS="$TESTS_ARGS $IF0"
 fi
 
 for GEN in $GENS; do
-    CALL_PARAMS="$GEN $TESTS_ARGS $PARAMS $BITSTREAMS"
-    time ./assess $N 2>&1 1> assess-$GEN.log <<< "$CALL_PARAMS" &
+  CALL_PARAMS="$GEN $TESTS_ARGS $PARAMS $BITSTREAMS"
+  time ./assess $N 2>&1 1> assess-$GEN.log <<< "$CALL_PARAMS" &
 done
+
+#for GEN in $EX_GENS; do
+#  CALL_PARAMS="0 $GEN $TESTS_ARGS $PARAMS $BITSTREAMS"
+#  NAME=`echo $GEN | sed s@/@-@g | sed s@-sequence@@ | sed s@gambler-gens-seq-@@`
+#  time ./assess $N 2>&1 1> assess-$NAME.log <<< "$CALL_PARAMS"
+#done
 
 wait
