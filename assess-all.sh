@@ -54,15 +54,44 @@ fi
 for GEN in $GENS; do
   CALL_PARAMS="$GEN $TESTS_ARGS $PARAMS $BITSTREAMS"
   echo $CALL_PARAMS
-  #time stdbuf -o0 ./assess $N 2>&1 1>assess-$GEN.log <<< "$CALL_PARAMS" &
+  time stdbuf -o0 ./assess $N &>assess-$GEN.log <<< "$CALL_PARAMS" &
 done
 
-for GEN in $EX_GENS; do
-  CALL_PARAMS="0 $GEN $TESTS_ARGS $PARAMS $BITSTREAMS 1"
+# Externals cannot be run the same way, since they always report to the same
+# directory. Instead, separate environments get created and each external GEN
+# is tested in a symlinked environment.
+function test_external # $1: GEN
+{
+  GEN=$1
+  CALL_PARAMS="0 $PWD/$GEN $TESTS_ARGS $PARAMS $BITSTREAMS 1"
+  # Create the output directory if doesn't exist
   NAME=`echo $GEN | sed s@/@-@g | sed s@-sequence@@ | sed s@gambler-gens-seq-@@`
+  rm -f  experiments/AlgorithmTesting/**/*.txt
+  rm -rf experiments/AlgorithmTesting-$NAME
+  cp -r  experiments/AlgorithmTesting{,-$NAME}
+
+  # Create a virtual test environment
+  TMPDIR=".env-$NAME"
+  mkdir -p $TMPDIR
+  ln -sf $PWD/assess $TMPDIR/
+  ln -sf $PWD/templates $TMPDIR/
+  ln -sf $PWD/data $TMPDIR/
+  mkdir -p $TMPDIR/experiments
+  ln -sf $PWD/experiments/AlgorithmTesting-$NAME $TMPDIR/experiments/AlgorithmTesting
+
+  LOGFILE="$PWD/assess-$NAME.log"
+
+  # Enter the environment and run tests
+  pushd $TMPDIR > /dev/null
   echo $CALL_PARAMS
-  time stdbuf -o0 ./assess $N 2>&1 1>assess-$NAME.log <<< "$CALL_PARAMS"
-  cp -r experiments/AlgorithmTesting{,-$NAME}
+  time stdbuf -o0 ./assess $N &>$LOGFILE <<< "$CALL_PARAMS"
+  popd > /dev/null
+
+  # Remove the environment
+  rm -r $TMPDIR
+}
+for GEN in $EX_GENS; do
+  test_external $GEN &
 done
 
 wait
