@@ -7,7 +7,7 @@ mkdir -p bin
 function compileSmallC # $1: generator name
 {
 	if [ ! -f bin/$1 ]; then
-		gcc --std=c99 generators/$1.c -o bin/$1 -O3
+		gcc --std=c99 generators/$1.c -o bin/$1 -O3 -g
 	fi
 }
 

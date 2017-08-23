@@ -69,13 +69,13 @@ void generate(RC4A *rc4a, size_t length)
   int i = rc4a->i, j1 = rc4a->j1, j2 = rc4a->j2;
   for(;length-->0;)
   {
-    i++;
-    j1 += S1[i];
+    i++; i %= 256;
+    j1 += S1[i]; j1 %= 256;
     swap(S1, i, j1);
-    putchar(S2[S1[i] + S1[j1]]);
-    j2 += S2[i];
+    putchar(S2[(S1[i] + S1[j1]) % 256]);
+    j2 += S2[i]; j2 %= 256;
     swap(S2, i, j2);
-    putchar(S1[S2[i] + S2[j2]]);
+    putchar(S1[(S2[i] + S2[j2]) % 256]);
   }
   rc4a->i = i;
   rc4a->j1 = j1;
@@ -90,22 +90,33 @@ int main(int argc, const char* argv[])
 		return -1;
 	}
 	int length = atoi(argv[1]);
-	size_t len = strlen(argv[2]);
-	size_t even_len = len + len % 2;
-	char keystr[even_len];
-	keystr[0] = '0';
-	strcpy(&(keystr[len % 2]), argv[2]);
+
+  /* Key: hex to binary */
+  size_t strLength = strlen(argv[2]);
+  size_t keyLength = (strLength / 2) + (strLength % 2);
+
+  char *keystr = malloc(keyLength * 2 + 1);
+  unsigned char *key = malloc(keyLength);
+
+  keystr[0] = '0';
+	memcpy(keystr + (strLength % 2), argv[2], strLength);
+  keystr[strLength] = 0; /* null-terminate string */
 
 	char *pos = keystr;
-	unsigned char key[even_len / 2];
-	for(int i = 0; i < even_len; ++i)
+  unsigned char *outpos = key;
+	for(int i = 0; i < keyLength; ++i)
 	{
-		sscanf(pos, "%2hhx", &key[i]);
+		sscanf(pos, "%2hhx", outpos);
 		pos += 2;
+    outpos++;
 	}
 
 	RC4A state;
-	initialize(&state, key, even_len / 2);
+	initialize(&state, key, keyLength);
 	generate(&state, length);
+
+  free(keystr);
+  free(key);
+
 	return 0;
 }

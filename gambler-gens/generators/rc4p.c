@@ -112,27 +112,39 @@ int main(int argc, const char* argv[])
 {
 	if(argc < 3)
 	{
-		fprintf(stderr, "Usage: rc4p [length] [key]\n");
+		fprintf(stderr, "Usage: rc4a [length] [key]\n");
 		return -1;
 	}
 	int length = atoi(argv[1]);
-	size_t len = strlen(argv[2]);
-	size_t even_len = len + len % 2;
-	char keystr[even_len];
-	keystr[0] = '0';
-	strcpy(&(keystr[len % 2]), argv[2]);
+
+  /* Key: hex to binary */
+  size_t strLength = strlen(argv[2]);
+  size_t keyLength = (strLength / 2) + (strLength % 2);
+
+  char *keystr = malloc(keyLength * 2 + 1);
+  unsigned char *key = malloc(keyLength);
+
+  keystr[0] = '0';
+	memcpy(keystr + (strLength % 2), argv[2], strLength);
+  keystr[strLength] = 0; /* null-terminate string */
 
 	char *pos = keystr;
-	unsigned char key[even_len / 2], vec[16];
-	for(int i = 0; i < 16; ++i) vec[i] = 0;
-	for(int i = 0; i < even_len; ++i)
+  unsigned char *outpos = key;
+	for(int i = 0; i < keyLength; ++i)
 	{
-		sscanf(pos, "%2hhx", &key[i]);
+		sscanf(pos, "%2hhx", outpos);
 		pos += 2;
+    outpos++;
 	}
 
+	unsigned char vec[16] = { 0 };
+
 	RC4p_State state;
-	initialization(&state, key, even_len / 2, vec, 16);
+	initialization(&state, key, keyLength, vec, 16);
 	stream(&state, length);
+
+  free(keystr);
+  free(key);
+
 	return 0;
 }
