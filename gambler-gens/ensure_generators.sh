@@ -21,6 +21,7 @@ function compileEstream # $1: generator name
 compileSmallC "spritz"
 compileSmallC "vmpc"
 compileSmallC "rc4p"
+compileSmallC "rc4a"
 compileSmallC "c_rand"
 compileSmallC "randu"
 compileSmallC "hc128"
@@ -37,4 +38,3 @@ compileEstream "salsa20"
 compileEstream "grain"
 compileEstream "mickey"
 compileEstream "ffcsr"
-

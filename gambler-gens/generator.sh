@@ -31,14 +31,14 @@ function hex # $1 keybase # interprets key as integer and returns hex repr.
 	printf "%064x\n" $1
 }
 
-function rel # $1 keybase 
+function rel # $1 keybase
 {
 	PREFIX=`sha $ADD_BASE | cut -c1-48`
 	SUFFIX=`hex $1 | cut -c49-64`
 	echo "$PREFIX$SUFFIX"
 }
 
-function wep # $1 keybase 
+function wep # $1 keybase
 {
 	PREFIX=`hex $1 | cut -c27-64`          #128 + 24 bits (first 128 gets cut with kdf128)
 	SUFFIX=`sha $ADD_BASE | cut -c1-26`    #104 bits
@@ -119,13 +119,13 @@ function rc4 # [length] [keybase]
 	KEY128=`kdf128 $2`
 	head -c $1 /dev/zero | openssl rc4 -K $KEY128
 }
-	
-function rc4-40 # [length] [keybase]
+
+function rc4-64 # [length] [keybase]
 {
-	KEY40=`kdf40 $2`
-	head -c $1 /dev/zero | openssl rc4 -K $KEY40
+	KEY64=`kdf64 $2`
+	head -c $1 /dev/zero | openssl rc4 -K $KEY64
 }
-	
+
 function spritz # [length] [keybase]
 {
 	KEY128=`kdf128 $2`
@@ -137,7 +137,13 @@ function vmpc # [length] [keybase]
 	KEY128=`kdf128 $2`
 	bin/vmpc $1 $KEY128
 }
-	
+
+function rc4a # [length] [keybase]
+{
+	KEY128=`kdf128 $2`
+	bin/rc4a $1 $KEY128
+}
+
 function rc4p # [length] [keybase]
 {
 	KEY128=`kdf128 $2`
@@ -185,25 +191,25 @@ function sosemanuk # [length] [keybase]
 	KEY256=`kdf256 $2`
 	bin/sosemanuk $1 $KEY256
 }
-	
+
 function salsa20 # [length] [keybase]
 {
 	KEY256=`kdf256 $2`
 	bin/salsa20 $1 $KEY256
 }
-	
+
 function grain # [length] [keybase]
 {
 	KEY128=`kdf128s $2`
 	bin/grain $1 $KEY128
 }
-	
+
 function mickey # [length] [keybase]
 {
 	KEY128=`kdf128 $2`
 	bin/mickey $1 $KEY128
 }
-	
+
 function ffcsr # [length] [keybase]
 {
 	KEY80=`kdf80 $2`
@@ -272,4 +278,3 @@ $2 $3 $4
 exec 1>&-
 
 #>&2 echo "stop  - $1 $2 $3 $4"
-

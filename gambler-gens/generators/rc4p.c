@@ -1,18 +1,18 @@
 /********************
  * Implementation by Bartlomiej Surma based on:
- * 
+ *
  * "Analysis of RC4 and Proposal of Additional Layers
  * for Better Security Margin" (2008)
  * by
  * Subhamoy Maitra and Goutam Paul
- * 
+ *
  * Usage:
  * RC4p_State state;
  * initialization(&state, key, 16, iv, 16);
  * stream(&state, 256);	//256 bytes will be outputed to stdout
  *
  * U can use stream function consecutively as many times as you like.
- * 
+ *
  * Note that (according to Subhamoy and Goutam)
  * iv should be of the same length as key
  * to avoid Time Memory Trade-Off attacks.
@@ -25,16 +25,24 @@
 
 void swap(unsigned char* arr, int a, int b)
 {
-	arr[a] ^= arr[b];
-	arr[b] ^= arr[a];
-	arr[a] ^= arr[b];
+	unsigned char tmp = arr[a];
+	arr[a] = arr[b];
+	arr[b] = tmp;
+	/*
+	if(a != b)
+	{
+		arr[a] ^= arr[b];
+		arr[b] ^= arr[a];
+		arr[a] ^= arr[b];
+	}
+	*/
 }
 
-typedef struct { 
-      unsigned char S[256];
-	  unsigned char i;
-	  unsigned char j;
-} RC4p_State; 
+typedef struct {
+  unsigned char S[256];
+  unsigned char i;
+  unsigned char j;
+} RC4p_State;
 
 void layer1(RC4p_State* state, unsigned char* key, int key_len)
 {
@@ -54,7 +62,7 @@ void layer2(RC4p_State* state, unsigned char* key, int key_len, unsigned char* i
 		state->j = ((state->j + state->S[i]) ^ (key[i % key_len] + iv[i % iv_len])) & 255;
 		swap(state->S, i, state->j);
 	}
-	
+
 	for(int i = 128; i < 256; ++i)
 	{
 		state->j = ((state->j + state->S[i]) ^ (key[i % key_len] + iv[i % iv_len])) & 255;
@@ -113,7 +121,7 @@ int main(int argc, const char* argv[])
 	char keystr[even_len];
 	keystr[0] = '0';
 	strcpy(&(keystr[len % 2]), argv[2]);
-	
+
 	char *pos = keystr;
 	unsigned char key[even_len / 2], vec[16];
 	for(int i = 0; i < 16; ++i) vec[i] = 0;
@@ -122,7 +130,7 @@ int main(int argc, const char* argv[])
 		sscanf(pos, "%2hhx", &key[i]);
 		pos += 2;
 	}
-	
+
 	RC4p_State state;
 	initialization(&state, key, even_len / 2, vec, 16);
 	stream(&state, length);
