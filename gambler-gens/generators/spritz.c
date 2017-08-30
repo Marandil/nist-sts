@@ -2,7 +2,7 @@
  * Code taken from https://github.com/jedisct1/spritz
  * Written in 2014-2016 by Frank Denis.
  * see the licence here: http://creativecommons.org/publicdomain/zero/1.0/
- * 
+ *
  * Modified by Bartlomiej Surma
  * ********************/
 
@@ -197,13 +197,14 @@ int main(int argc, const char* argv[])
 		fprintf(stderr, "Usage: spritz [length] [key]\n");
 		return -1;
 	}
-	int length = atoi(argv[1]);
+  size_t length = strtoull(argv[1], NULL, 10);
+
 	size_t len = strlen(argv[2]);
 	size_t even_len = len + len % 2;
 	char keystr[even_len];
 	keystr[0] = '0';
 	strcpy(&(keystr[len % 2]), argv[2]);
-	
+
 	char *pos = keystr;
 	const unsigned char key[even_len / 2];
 	for(int i = 0; i < even_len; ++i)
@@ -211,8 +212,8 @@ int main(int argc, const char* argv[])
 		sscanf(pos, "%2hhx", &key[i]);
 		pos += 2;
 	}
-	
+
 	spritz_stream(length, key, even_len / 2);
-	
+
 	return 0;
 }

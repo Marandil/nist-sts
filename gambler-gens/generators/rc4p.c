@@ -90,7 +90,7 @@ void initialization(RC4p_State* state, unsigned char* key, int key_len, unsigned
 	state->j = 0;
 }
 
-void stream(RC4p_State* state, int length)
+void stream(RC4p_State* state, size_t length)
 {
 	unsigned char t1, t2, t3;
 	for(int k=0; k < length; ++k){
@@ -115,7 +115,7 @@ int main(int argc, const char* argv[])
 		fprintf(stderr, "Usage: rc4a [length] [key]\n");
 		return -1;
 	}
-	int length = atoi(argv[1]);
+	size_t length = strtoull(argv[1], NULL, 10);
 
   /* Key: hex to binary */
   size_t strLength = strlen(argv[2]);

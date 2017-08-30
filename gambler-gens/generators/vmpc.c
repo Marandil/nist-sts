@@ -3,14 +3,14 @@
 /*---------------------------------------------------------------------------------------------------
 
                  Implementation of the VMPC Stream Cipher
-                                 and 
+                                 and
               the VMPC-MAC Authenticated Encryption Scheme
                                  in C
 
                 Author of the algorithms: Bartosz Zoltak
               Author of the implementation: Bartosz Zoltak
 
-                         www.vmpcfunction.com 
+                         www.vmpcfunction.com
 
 -----------------------------------------------------------------------------------------------------
 ----------------------- Usage of the algorithms: ----------------------------------------------------
@@ -28,7 +28,7 @@ Decryption:
    VMPCInitKey(Key, Vector, 16, 16);
    VMPCEncrypt(Message, 1000);
 
-   (the VMPCEncrypt function is used for both encryption and decryption). 
+   (the VMPCEncrypt function is used for both encryption and decryption).
 
 Authenticated Encryption (with the MAC tag):
 
@@ -54,9 +54,9 @@ provide higher security level but about 1/3 lower efficiency.
 than the basic VMPCInitKeyBASIC / VMPCInitKey16BASIC functions.
 
 If only the system efficiency allows, the author recommends to use the VMPCInitKey / VMPCInitKey16 functions.
-At the same time the VMPCInitKeyBASIC / VMPCInitKey16BASIC functions also remain secure. 
+At the same time the VMPCInitKeyBASIC / VMPCInitKey16BASIC functions also remain secure.
 ----------------------------------------------------------------------------------------------------
-CAUTION! 
+CAUTION!
 A DIFFERENT value of the initialization vector ("Vector")
 should be used for each encryption with the same key ("Key").
 
@@ -188,9 +188,9 @@ void VMPCInitKeyBASIC(unsigned char Key[], unsigned char Vec[], unsigned char Ke
 
 
 
-void VMPCEncrypt(unsigned int Len)
+void VMPCEncrypt(size_t Len)
 {
-  for (unsigned int x=0; x<Len; x++)
+  for (size_t x=0; x<Len; x++)
   {
     s=P[ (s + P[n]) & 255 ];
 
@@ -214,13 +214,14 @@ int main(int argc, const char* argv[])
 		fprintf(stderr, "Usage: vmpc [length] [key]\n");
 		return -1;
 	}
-	int length = atoi(argv[1]);
+  size_t length = strtoull(argv[1], NULL, 10);
+
 	size_t len = strlen(argv[2]);
 	size_t even_len = len + len % 2;
 	char keystr[even_len];
 	keystr[0] = '0';
 	strcpy(&(keystr[len % 2]), argv[2]);
-	
+
 	char *pos = keystr;
 	unsigned char key[even_len / 2], vec[16];
 	for(int i = 0; i < 16; ++i) vec[i] = 0;
@@ -229,13 +230,13 @@ int main(int argc, const char* argv[])
 		sscanf(pos, "%2hhx", &key[i]);
 		pos += 2;
 	}
-	
+
 	//* //for KSA version
 	VMPCInitKeyBASIC(key, vec, even_len / 2, 16);
 	/*/  //for KSA3 version
 	VMPCInitKey(key, vec, even_len / 2, 16);
 	//*/
 	VMPCEncrypt(length);
-	
+
 	return 0;
 }

@@ -67,15 +67,17 @@ void generate(RC4A *rc4a, size_t length)
   byte *S1 = rc4a->S1;
   byte *S2 = rc4a->S2;
   int i = rc4a->i, j1 = rc4a->j1, j2 = rc4a->j2;
-  for(;length-->0;)
+  for(;length>0;)
   {
     i++; i %= 256;
     j1 += S1[i]; j1 %= 256;
     swap(S1, i, j1);
     putchar(S2[(S1[i] + S1[j1]) % 256]);
+    length--;
     j2 += S2[i]; j2 %= 256;
     swap(S2, i, j2);
     putchar(S1[(S2[i] + S2[j2]) % 256]);
+    length--;
   }
   rc4a->i = i;
   rc4a->j1 = j1;
@@ -89,7 +91,7 @@ int main(int argc, const char* argv[])
 		fprintf(stderr, "Usage: rc4a [length] [key]\n");
 		return -1;
 	}
-	int length = atoi(argv[1]);
+	size_t length = strtoull(argv[1], NULL, 10);
 
   /* Key: hex to binary */
   size_t strLength = strlen(argv[2]);
