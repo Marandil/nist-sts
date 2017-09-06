@@ -236,6 +236,7 @@ fixParameters()
 				printf("         Test mask is a bit mask: T1 - 1\n");
 				printf("                                  T2 - 2\n");
 				printf("                                  T3 - 4\n");
+				printf("                                  T4 - 8\n");
 
 				printf("   Enter number of runs per Gambler's starting point: ");
 				safe_scanf("%d", &tp.gamblerRunsPerStartingPoint);

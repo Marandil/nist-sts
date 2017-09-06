@@ -19,4 +19,3 @@ void	RandomExcursionsVariant(int n);
 void	LinearComplexity(int M, int n);
 void	Serial(int m, int n);
 void	Gambler(int M, int n, unsigned start, unsigned end, unsigned mask);
-char* GamblerNextTestName(); /* Custom labels for multiple Gambler p-value tests */

@@ -55,6 +55,7 @@ void	partitionResultFile(int numOfFiles, int numOfSequences, int option, int tes
 void	postProcessResults(int option);
 int		cmp(const double *a, const double *b);
 int		computeMetrics(char *s, int test);
+char* GamblerNextTestName(); /* Custom labels for multiple Gambler p-value tests */
 
 int
 main(int argc, char *argv[])
@@ -89,6 +90,7 @@ main(int argc, char *argv[])
 	invokeTestSuite(option, streamFile);
 	fclose(freqfp);
 	for( i=1; i<=NUMOFTESTS; i++ ) {
+	char* GamblerNextTestName(); /* Custom labels for multiple Gambler p-value tests */
 		if ( stats[i] != NULL )
 			fclose(stats[i]);
 		if ( results[i] != NULL )

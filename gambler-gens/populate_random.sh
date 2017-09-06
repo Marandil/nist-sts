@@ -14,7 +14,9 @@ fi
 # list of supported generators
 if [ -z "$GENS" ]; then
 	# GENS="urandom openssl-rnd rc4 rc4-64 spritz vmpc rc4a rc4p aes128ctr aes192ctr aes256ctr hc128 rabbit trivium sosemanuk salsa20 grain mickey ffcsr mersenne mersenne_ar minstd oldbsd borland vs cmrg randu c_rand"
-	GENS="rc4 rc4-64 spritz vmpc rc4a rc4p randu"
+	# GENS="rc4 rc4-64 spritz vmpc rc4a rc4p randu"
+	# GENS="$GENS salsa20 urandom aes256ctr"
+	GENS="$GENS mersenne"
 fi
 
 # list of supported KDFs

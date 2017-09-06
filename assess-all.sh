@@ -2,7 +2,7 @@
 
 # Bit length of streams to be tested:
 #N=$((32*1024*1024*8))  # 32 MB
-N=$((1024*8))          # 1 kB
+N=$((64*1024*1024*8))          # 512 MB
 
 # List of built-in generators to be tested
 # [0] Input File (see below)
@@ -15,14 +15,15 @@ N=$((1024*8))          # 1 kB
 # [7] Blum-Blum-Shub
 # [8] Micali-Schnorr
 # [9] G Using SHA-1
-GENS="1 2 3 4 5 6 7 8 9"
+#GENS="1 2 3 4 5 6 7 8 9"
+GENS=""
 
 # List of external generators to be tested
-EX_GENS=`ls gambler-gens/seq/*/*-sequence`
+EX_GENS=`ls gambler-gens/seq/sha/*-sequence`
 
 # Set 0 if you only want to apply Gambler test
 # Set 1 if you want to apply all of them
-TESTS=1
+TESTS=0
 
 # (modify if you want other tests if TESTS=0)
 IF0="0000000000000001"
@@ -42,6 +43,7 @@ IF0="0000000000000001"
 #  [7] Gambler - runs per starting point(M):           1000
 
 PARAMS="0"
+#PARAMS="1 10000 1 0 7 0"
 
 # How many bitstreams to test?
 BITSTREAMS=1024
@@ -83,8 +85,9 @@ function test_external # $1: GEN
 
   # Enter the environment and run tests
   pushd $TMPDIR > /dev/null
-  echo $CALL_PARAMS
-  time stdbuf -o0 ./assess $N &>$LOGFILE <<< "$CALL_PARAMS"
+  echo $CALL_PARAMS > params.txt
+  cat params.txt
+  time stdbuf -o0 ./assess $N &>$LOGFILE < params.txt
   popd > /dev/null
 
   # Remove the environment

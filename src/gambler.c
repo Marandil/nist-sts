@@ -10,8 +10,8 @@
                             G A M B L E R  T E S T
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
- // Number of states/total capital
-#define N 33
+// Number of states/total capital
+#define N 129
 
 #ifndef USE_BIT_TRACKER
 #define USE_BIT_TRACKER 1
@@ -20,6 +20,7 @@
 #define MASK_T1 0x01
 #define MASK_T2 0x02
 #define MASK_T3 0x04
+#define MASK_T4 0x08
 
 typedef struct
 {
@@ -112,26 +113,30 @@ frac_to_fixed(uint64_t nom, uint64_t den)
 uint64_t T1[N]; // = 0.48
 uint64_t T2[N]; // = i / (2i+1)
 uint64_t T3[N]; // = (i^3) / (i^3+(i+1)^3)
+uint64_t T4[N]; // = 1/2 + sin(i^2)/4
 
 // Expected winning outcomes
 double T1e[N];
 double T2e[N];
 double T3e[N];
+double T4e[N];
 
 // Expected game lengths
 double T1le[N];
 double T2le[N];
 double T3le[N];
+double T4le[N];
 
-// Expected game lengths
+// Variations of game lengths
 double T1lv[N];
 double T2lv[N];
 double T3lv[N];
+double T4lv[N];
 
+#define p2d(P) ((double)(P) / (double)(1ull << 32) / (double)(1ull << 32))
 void
 compute_times(uint64_t *prob, double *e_out, double *var_out)
 {
-	#define p2d(P) ((double)(P) / (double)(1ull << 32) / (double)(1ull << 32))
 
 	double p, q;
 	double d[N]; // d[k] = prod[i=1, k] { q(i) / p(i) }
@@ -181,12 +186,42 @@ compute_times(uint64_t *prob, double *e_out, double *var_out)
 	{
 		var_out[i] = (g[0] + v[N-1]) / h[0] * h[i] - g[i] - v[i-1] - e_out[i]*e_out[i];
 	}
-	#undef p2d
 }
+
+void
+compute_probs(uint64_t *prob, double *e_out)
+{
+
+	double p, q;
+	double d[N]; // d[k] = prod[i=1, k] { q(i) / p(i) }
+	double h[N]; // h[m] = sum[k=0, m-1] { d[k] }
+
+	unsigned i;
+
+	d[0] = 1;
+	h[0] = 0;
+	for ( i = 1; i < N; ++i )
+	{
+		p = p2d(prob[i]);
+		q = p2d(-prob[i]);
+		d[i] = d[i-1] / p * q;
+		h[i] = h[i-1] + d[i-1];
+	}
+	// Wrap to accomodate for non-existing h[N]
+	h[0] = h[i-1] + d[i-1];
+
+	for ( i = 1; i < N; ++i )
+	{
+		e_out[i] = h[i] / h[0];
+	}
+}
+#undef p2d
 
 void
 init_arrays ()
 {
+	#define d2p(D) (uint64_t)((double)(D) * (double)(1ull << 32) * (double)(1ull << 32))
+
 	static bool done = false;
 	if ( done ) return;
 
@@ -199,6 +234,7 @@ init_arrays ()
 		T1[i] = frac_to_fixed(48, 100);
 		T2[i] = frac_to_fixed(i, 2*i + 1);
 		T3[i] = frac_to_fixed(i*i*i, i*i*i + (i+1)*(i+1)*(i+1));
+		T4[i] = d2p(0.5 + 0.25*sin(i*i));
 	}
 
 	// For all starting points, compute expected prob.
@@ -235,6 +271,11 @@ init_arrays ()
 		}
 
 		compute_times(T3, T3le, T3lv);
+	}
+	// T4
+	{
+		compute_probs(T4, T4e);
+		compute_times(T4, T4le, T4lv);
 	}
 
 	done = true;
@@ -278,11 +319,13 @@ run_gambler(stream_state* st, unsigned s, uint64_t* p, uint64_t* w_out, uint64_t
 uint64_t W1[N];
 uint64_t W2[N];
 uint64_t W3[N];
+uint64_t W4[N];
 
 // Total game lengths per stering point
 uint64_t L1[N];
 uint64_t L2[N];
 uint64_t L3[N];
+uint64_t L4[N];
 
 void
 zero_arrays()
@@ -366,7 +409,8 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 	// test.
 	GAMBLER_NUM_OF_TESTS = ((test_mask >> 0) & 1)
 											 + ((test_mask >> 1) & 1)
-											 + ((test_mask >> 2) & 1);
+											 + ((test_mask >> 2) & 1)
+											 + ((test_mask >> 3) & 1);
 	GAMBLER_NUM_OF_FILES = (s_end - s_start + 1)
 	                     * GAMBLER_NUM_OF_TESTS
 											 * 2;
@@ -393,7 +437,7 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 			for ( c = M; c > 0; --c )
 				run_gambler(&st, s, T2, &W2[s], &L2[s]);
 		if ( st.wraps )
-			fprintf(stderr, "WARNING (T1): Gambler next_bit wrapped %d times.\n", st.wraps);
+			fprintf(stderr, "WARNING (T2): Gambler next_bit wrapped %d times.\n", st.wraps);
 	}
 	if ( test_mask & MASK_T3 )
 	{
@@ -402,7 +446,16 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 			for ( c = M; c > 0; --c )
 				run_gambler(&st, s, T3, &W3[s], &L3[s]);
 		if ( st.wraps )
-			fprintf(stderr, "WARNING (T1): Gambler next_bit wrapped %d times.\n", st.wraps);
+			fprintf(stderr, "WARNING (T3): Gambler next_bit wrapped %d times.\n", st.wraps);
+	}
+	if ( test_mask & MASK_T4 )
+	{
+		st.pos = 0;
+		for ( s = s_start; s <= s_end; ++s )
+			for ( c = M; c > 0; --c )
+				run_gambler(&st, s, T4, &W4[s], &L4[s]);
+		if ( st.wraps )
+			fprintf(stderr, "WARNING (T4): Gambler next_bit wrapped %d times.\n", st.wraps);
 	}
 
 	fprintf(stats[TEST_GAMBLER], "\t\t\t        GAMBLER TEST\n");
@@ -445,6 +498,17 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 		}
 		print_statistics(M, T3e, W3, T3le, T3lv, L3, s_start, s_end);
 	}
+	if(test_mask & MASK_T4)
+	{
+		fprintf(stats[TEST_GAMBLER], "\t\tT4 :                                         \n");
+		for ( s = s_start; s <= s_end; ++s )
+		{
+			fprintf(stats[TEST_GAMBLER], "\t\t\tStarting point %d:                         \n", s);
+			fprintf(stats[TEST_GAMBLER], "\t\tT4;%d; (a) Games won     (/M) (expected) = %ld (%lf) (%lf)\n", s, W4[s], (double)W4[s]/M, T4e[s]);
+			fprintf(stats[TEST_GAMBLER], "\t\tT4;%d; (b) Total length  (/M) (expected) = %ld (%lf) (%lf)\n", s, L4[s], (double)L4[s]/M, T4le[s]);
+		}
+		print_statistics(M, T4e, W4, T4le, T4lv, L4, s_start, s_end);
+	}
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
 
 }
@@ -469,6 +533,8 @@ char* GamblerNextTestName()
 			GAMBLER_TEST_NAMES[t++] = "T2";
 		if(GAMBLER_TEST_MASK & MASK_T3)
 			GAMBLER_TEST_NAMES[t++] = "T3";
+		if(GAMBLER_TEST_MASK & MASK_T4)
+			GAMBLER_TEST_NAMES[t++] = "T4";
 
 		initialized = true;
 		assert(GAMBLER_NUM_OF_TESTS == t);
