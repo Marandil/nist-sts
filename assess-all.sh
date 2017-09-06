@@ -2,7 +2,7 @@
 
 # Bit length of streams to be tested:
 #N=$((32*1024*1024*8))  # 32 MB
-N=$((64*1024*1024*8))          # 512 MB
+N=$((64*1024*1024*8))   # 64 MB
 
 # List of built-in generators to be tested
 # [0] Input File (see below)
@@ -42,8 +42,8 @@ IF0="0000000000000001"
 #  [6] Linear Complexity Test - block length(M):       500
 #  [7] Gambler - runs per starting point(M):           1000
 
-PARAMS="0"
-#PARAMS="1 10000 1 0 7 0"
+#PARAMS="0"
+PARAMS="1 1000 1 0 8 0"
 
 # How many bitstreams to test?
 BITSTREAMS=1024

@@ -11,7 +11,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // Number of states/total capital
-#define N 129
+#define N 100
 
 #ifndef USE_BIT_TRACKER
 #define USE_BIT_TRACKER 1
