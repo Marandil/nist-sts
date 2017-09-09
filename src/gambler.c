@@ -17,6 +17,10 @@
 #define USE_BIT_TRACKER 1
 #endif
 
+#ifndef USE_REDUCED_PQ
+#define USE_REDUCED_PQ 1
+#endif
+
 #define MASK_T1 0x01
 #define MASK_T2 0x02
 #define MASK_T3 0x04
@@ -47,6 +51,13 @@ next_bit(stream_state* state)
 	return bit;
 }
 
+typedef enum step_direction {
+	STEP_UNDEF,
+	STEP_LEFT,
+	STEP_STAY,
+	STEP_RIGHT
+} step_direction_t;
+
 #if USE_BIT_TRACKER == 0
 /* Read 64 bits from the stream_state as 64-bit little endian, unsigned integer
  */
@@ -66,14 +77,28 @@ next_u64(stream_state* state)
 }
 #else
 /* A simplified version of BitTracker
-   will only split on 1 value instead of on any number of them
+   will only split on 2 values instead of on any number of them
  */
-bool
-bit_track(uint64_t split, stream_state* state)
+
+ /* required invariant: left <= right, split_left <= split_right */
+step_direction_t
+check_split(uint64_t split_left, uint64_t split_right,
+	          uint64_t left, uint64_t right)
+{
+  if (right < split_left) return STEP_LEFT;
+	if ((split_left <= left) && (right < split_right)) return STEP_STAY;
+	if (split_right <= left) return STEP_RIGHT;
+	return STEP_UNDEF;
+}
+
+step_direction_t
+bit_track(uint64_t split_left, uint64_t split_right, stream_state* state)
 {
 	uint64_t mask  = 0x8000000000000000ull;
 	uint64_t left  = 0x0000000000000000ull;
 	uint64_t right = 0xffffffffffffffffull;
+
+	step_direction_t step;
 	do {
 		bool bit = next_bit(state);
 		if ( bit )
@@ -82,11 +107,11 @@ bit_track(uint64_t split, stream_state* state)
 			right &= ~mask;
 
 		mask >>= 1;
-	} while ( left < split && split < right && mask );
+	} while ((mask > 0) && ( STEP_UNDEF == (step = check_split(split_left, split_right, left, right)) ));
 	if ( !mask )
 		fprintf(stderr, "bit_track aborted abnormally\n");
 
-	return left >= split;
+	return step;
 }
 #endif
 
@@ -287,20 +312,30 @@ run_gambler(stream_state* st, unsigned s, uint64_t* p, uint64_t* w_out, uint64_t
 	uint64_t l = 0;
 	unsigned i = s;
 
-	while ( i > 0 && i < N )
+	while ( 0 < i && i < N )
 	{
-		#if USE_BIT_TRACKER == 1
-		// Negate the result of bit_track : result 0 suggests value < p;
-		bool step = !bit_track(p[i], st);
+		/* q[i] = 1-p[i] */
+		#if USE_REDUCED_PQ == 1
+		/* For this test, we take ranges [0, q[i]/2], [1-p[i]/2, 1] */
+		uint64_t left = (-p[i]) / 2;
+		uint64_t right = -(p[i] / 2);
 		#else
-		bool step = (next_u64(st) < p[i]);
+		uint64_t left = -p[i];
+		uint64_t right = left;
 		#endif
 
-		if ( step )
+		#if USE_BIT_TRACKER == 1
+		step_direction_t step = bit_track(left, right, st);
+		#else
+		uint64_t s = next_u64(st);
+		step_direction_t step = ( s < left ? STEP_LEFT : s < right ? STEP_STAY : STEP_RIGHT);
+		#endif
+
+		if ( STEP_RIGHT == step )
 		{
 			++i;
 		}
-		else
+		else if ( STEP_LEFT == step )
 		{
 			--i;
 		}
