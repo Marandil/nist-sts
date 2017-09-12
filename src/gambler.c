@@ -420,6 +420,9 @@ Gambler(int M, size_t n, unsigned s_start, unsigned s_end, unsigned test_mask)
 	GAMBLER_S_START = s_start;
 	GAMBLER_S_END = s_end;
 
+	size_t bitsUsed = 0;
+	size_t totalWraps = 0;
+
 	// For each T table reset stream state (treat as a separate, independent statistical test)
 	if ( test_mask & MASK_T1 )
 	{
@@ -430,7 +433,8 @@ Gambler(int M, size_t n, unsigned s_start, unsigned s_end, unsigned test_mask)
 				run_gambler(&st, s, T1, &W1[s], &L1[s]);
 		if ( st.wraps )
 			fprintf(stderr, "WARNING (T1): Gambler next_bit wrapped %d times.\n", st.wraps);
-
+    bitsUsed += (st.wraps * st.max + st.pos);
+		totalWraps += st.wraps;
 	}
 	if ( test_mask & MASK_T2 )
 	{
@@ -440,6 +444,8 @@ Gambler(int M, size_t n, unsigned s_start, unsigned s_end, unsigned test_mask)
 				run_gambler(&st, s, T2, &W2[s], &L2[s]);
 		if ( st.wraps )
 			fprintf(stderr, "WARNING (T2): Gambler next_bit wrapped %d times.\n", st.wraps);
+    bitsUsed += (st.wraps * st.max + st.pos);
+		totalWraps += st.wraps;
 	}
 	if ( test_mask & MASK_T3 )
 	{
@@ -449,6 +455,8 @@ Gambler(int M, size_t n, unsigned s_start, unsigned s_end, unsigned test_mask)
 				run_gambler(&st, s, T3, &W3[s], &L3[s]);
 		if ( st.wraps )
 			fprintf(stderr, "WARNING (T3): Gambler next_bit wrapped %d times.\n", st.wraps);
+    bitsUsed += (st.wraps * st.max + st.pos);
+		totalWraps += st.wraps;
 	}
 	if ( test_mask & MASK_T4 )
 	{
@@ -458,14 +466,16 @@ Gambler(int M, size_t n, unsigned s_start, unsigned s_end, unsigned test_mask)
 				run_gambler(&st, s, T4, &W4[s], &L4[s]);
 		if ( st.wraps )
 			fprintf(stderr, "WARNING (T4): Gambler next_bit wrapped %d times.\n", st.wraps);
+    bitsUsed += (st.wraps * st.max + st.pos);
+		totalWraps += st.wraps;
 	}
 
 	fprintf(stats[TEST_GAMBLER], "\t\t\t        GAMBLER TEST\n");
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
 	fprintf(stats[TEST_GAMBLER], "\t\tCOMPUTATIONAL INFORMATION:\n");
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
-	fprintf(stats[TEST_GAMBLER], "\t\tNo. of next_bit wraps: %d                    \n", st.wraps);
-	fprintf(stats[TEST_GAMBLER], "\t\tNo. of next_bit calls: %zd                   \n", st.wraps*st.max+st.pos);
+	fprintf(stats[TEST_GAMBLER], "\t\tNo. of next_bit wraps: %zd                   \n", totalWraps);
+	fprintf(stats[TEST_GAMBLER], "\t\tNo. of next_bit calls: %zd                   \n", bitsUsed);
 	fprintf(stats[TEST_GAMBLER], "\t\t---------------------------------------------\n");
 	if(test_mask & MASK_T1)
 	{
