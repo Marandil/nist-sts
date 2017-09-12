@@ -15,9 +15,9 @@ void	SHA1();
 
 
 /* The circular shifts. */
-#define CS1(x) ((((ULONG)x)<<1)|(((ULONG)x)>>31))
-#define CS5(x)  ((((ULONG)x)<<5)|(((ULONG)x)>>27))
-#define CS30(x)  ((((ULONG)x)<<30)|(((ULONG)x)>>2))
+#define CS1(x) ((((uint32_t)x)<<1)|(((uint32_t)x)>>31))
+#define CS5(x)  ((((uint32_t)x)<<5)|(((uint32_t)x)>>27))
+#define CS30(x)  ((((uint32_t)x)<<30)|(((uint32_t)x)>>2))
 
 /* K constants */
 

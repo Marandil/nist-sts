@@ -330,8 +330,8 @@ readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile)
 void
 readHexDigitsInBinaryFormat(FILE *fp)
 {
-	size_t i, done, num_0s, num_1s, bitsRead;
-	BYTE   buffer[4];
+	size_t  i, done, num_0s, num_1s, bitsRead;
+	uint8_t buffer[4];
 
 	if ( (epsilon = (BitSequence *) calloc(tp.n,sizeof(BitSequence))) == NULL ) {
 		printf("BITSTREAM DEFINITION:  Insufficient memory available.\n");
