@@ -13,7 +13,8 @@ OBJ = $(OBJDIR)/assess.o $(OBJDIR)/frequency.o $(OBJDIR)/blockFrequency.o \
       $(OBJDIR)/approximateEntropy.o $(OBJDIR)/randomExcursions.o \
       $(OBJDIR)/randomExcursionsVariant.o $(OBJDIR)/linearComplexity.o \
       $(OBJDIR)/dfft.o $(OBJDIR)/cephes.o $(OBJDIR)/matrix.o \
-      $(OBJDIR)/utilities.o $(OBJDIR)/generators.o $(OBJDIR)/genutils.o
+      $(OBJDIR)/utilities.o $(OBJDIR)/generators.o $(OBJDIR)/genutils.o \
+			$(OBJDIR)/memutils.o
 
 assess: $(OBJ)
 	$(CC) -o $@ $(OBJ) -lm
@@ -84,11 +85,15 @@ $(OBJDIR)/genutils.o: $(SRCDIR)/genutils.c config.h genutils.h
 $(OBJDIR)/cephes.o: $(SRCDIR)/cephes.c cephes.h
 	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/cephes.c
 
-$(OBJDIR)/utilities.o: $(SRCDIR)/utilities.c defs.h externs.h utilities.h config.h
+$(OBJDIR)/utilities.o: $(SRCDIR)/utilities.c defs.h externs.h utilities.h config.h \
+	      memutils.h
 	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/utilities.c
 
+$(OBJDIR)/memutils.o: $(SRCDIR)/memutils.c
+	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/memutils.c
+
 $(OBJDIR)/generators.o: $(SRCDIR)/generators.c defs.h externs.h utilities.h \
-        config.h generators.h
+        config.h generators.h memutils.h
 	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/generators.c
 
 clean:

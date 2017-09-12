@@ -9,6 +9,8 @@
 #include "../include/generators.h"
 #include "../include/genutils.h"
 
+#include "../include/memutils.h"
+
 double
 lcg_rand(size_t N, double SEED, double* DUNIF, size_t NDIM)
 {
@@ -51,8 +53,8 @@ lcg()
 	size_t i, v;
 
 	SEED = 23482349.0;
-	if ( ((epsilon = (BitSequence *) calloc(tp.n, sizeof(BitSequence))) == NULL) ||
-	     ((DUNIF = (double*)calloc(tp.n, sizeof(double))) == NULL) ) {
+	if ( ((epsilon = (BitSequence *) mcalloc(tp.n, sizeof(BitSequence))) == NULL) ||
+	     ((DUNIF = (double*)mcalloc(tp.n, sizeof(double))) == NULL) ) {
 		printf("Insufficient memory available.\n");
 		exit(1);
 	}
@@ -77,8 +79,8 @@ lcg()
 		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s); fflush(freqfp);
 		nist_test_suite();
 		}
-	free(DUNIF);
-	free(epsilon);
+	mfree(DUNIF);
+	mfree(epsilon);
 }
 
 
@@ -88,7 +90,7 @@ quadRes1()
 	size_t k, num_0s, num_1s, bitsRead, done;
 	uint8_t	 p[64], g[64], x[128];
 
-	if ( ((epsilon = (BitSequence *)calloc(tp.n, sizeof(BitSequence))) == NULL) ) {
+	if ( ((epsilon = (BitSequence *)mcalloc(tp.n, sizeof(BitSequence))) == NULL) ) {
 		printf("Insufficient memory available.\n");
 		exit(1);
 	}
@@ -112,7 +114,7 @@ quadRes1()
 		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s); fflush(freqfp);
 		nist_test_suite();
 	}
-	free(epsilon);
+	mfree(epsilon);
 
 	return;
 }
@@ -124,7 +126,7 @@ quadRes2()
 	uint8_t   One[1], Two, Three[1];
 	size_t k, num_0s, num_1s, bitsRead, done;
 
-	if ( ((epsilon = (BitSequence *)calloc(tp.n, sizeof(BitSequence))) == NULL) ) {
+	if ( ((epsilon = (BitSequence *)mcalloc(tp.n, sizeof(BitSequence))) == NULL) ) {
 		printf("Insufficient memory available.\n");
 		exit(1);
 	}
@@ -152,7 +154,7 @@ quadRes2()
 		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s); fflush(freqfp);
 		nist_test_suite();
 	}
-	free(epsilon);
+	mfree(epsilon);
 
 	return;
 }
@@ -163,7 +165,7 @@ cubicRes()
 	uint8_t   g[64], tmp[128], x[192];
 	size_t k, num_0s, num_1s, bitsRead, done;
 
-	if ( ((epsilon = (BitSequence *)calloc(tp.n, sizeof(BitSequence))) == NULL) ) {
+	if ( ((epsilon = (BitSequence *)mcalloc(tp.n, sizeof(BitSequence))) == NULL) ) {
 		printf("Insufficient memory available.\n");
 		exit(1);
 	}
@@ -186,7 +188,7 @@ cubicRes()
 		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s); fflush(freqfp);
 		nist_test_suite();
 	}
-	free(epsilon);
+	mfree(epsilon);
 
 	return;
 }
@@ -197,7 +199,7 @@ exclusiveOR()
 	size_t i, num_0s, num_1s, bitsRead;
 	uint8_t   bit_sequence[127];
 
-	if ( ((epsilon = (BitSequence *)calloc(tp.n,sizeof(BitSequence))) == NULL) ) {
+	if ( ((epsilon = (BitSequence *)mcalloc(tp.n,sizeof(BitSequence))) == NULL) ) {
 		printf("Insufficient memory available.\n");
 		exit(1);
 	}
@@ -237,7 +239,7 @@ exclusiveOR()
 			bitsRead = 0;
 		}
 	}
-	free(epsilon);
+	mfree(epsilon);
 
 	return;
 }
@@ -249,7 +251,7 @@ modExp()
 	size_t k, num_0s, num_1s, bitsRead, done;
 	uint8_t   p[64], g[64], x[192], y[20];
 
-	if ( (epsilon = (BitSequence *)calloc(tp.n, sizeof(BitSequence))) == NULL ) {
+	if ( (epsilon = (BitSequence *)mcalloc(tp.n, sizeof(BitSequence))) == NULL ) {
 		printf("Insufficient memory available.\n");
 		exit(1);
 	}
@@ -271,7 +273,7 @@ modExp()
 		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s); fflush(freqfp);
 		nist_test_suite();
 	}
-	free(epsilon);
+	mfree(epsilon);
 
 	return;
 }
@@ -283,7 +285,7 @@ bbs()
 	uint8_t   p[64], q[64], n[128], s[64], x[256];
 	size_t num_0s, num_1s;
 
-	if ( (epsilon = (BitSequence*)calloc(tp.n, sizeof(BitSequence))) == NULL ) {
+	if ( (epsilon = (BitSequence*)mcalloc(tp.n, sizeof(BitSequence))) == NULL ) {
 		printf("Insufficient memory available.\n");
 		exit(1);
 	}
@@ -319,7 +321,7 @@ bbs()
 		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s); fflush(freqfp);
 		nist_test_suite();
 	}
-	free(epsilon);
+	mfree(epsilon);
 }
 
 
@@ -332,7 +334,7 @@ micali_schnorr()
 	size_t k=837, num_0s, num_1s, bitsRead, done;
 	uint8_t	p[64], q[64], n[128], e[1], X[128], Y[384], Tail[105];
 
-	if ( (epsilon = (BitSequence *)calloc(tp.n, sizeof(BitSequence))) == NULL ) {
+	if ( (epsilon = (BitSequence *)mcalloc(tp.n, sizeof(BitSequence))) == NULL ) {
 		printf("Insufficient memory available.\n");
 		exit(1);
 	}
@@ -363,7 +365,7 @@ micali_schnorr()
 		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s); fflush(freqfp);
 		nist_test_suite();
 	}
-	free(epsilon);
+	mfree(epsilon);
 }
 
 //  Uses 160 bit Xkey and no XSeed (b=160)
@@ -378,7 +380,7 @@ SHA1()
 	size_t done;
 	uint32_t	tx[5] = { 0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0 };
 
-	if ( ((epsilon = (BitSequence *) calloc(tp.n,sizeof(BitSequence))) == NULL) ) {
+	if ( ((epsilon = (BitSequence *) mcalloc(tp.n,sizeof(BitSequence))) == NULL) ) {
 		printf("Insufficient memory available.\n");
 		exit(1);
 	}
@@ -452,5 +454,5 @@ SHA1()
 		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s); fflush(freqfp);
 		nist_test_suite();
 	}
-	free(epsilon);
+	mfree(epsilon);
 }

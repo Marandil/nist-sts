@@ -11,6 +11,8 @@ U T I L I T I E S
 #include "../include/generators.h"
 #include "../include/stat_fncs.h"
 
+#include "../include/memutils.h"
+
 int
 displayGeneratorOptions()
 {
@@ -294,7 +296,7 @@ readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile)
 	size_t   i, j, num_0s, num_1s, bitsRead;
 	unsigned bit;
 
-	if ( (epsilon = (BitSequence *) calloc(tp.n, sizeof(BitSequence))) == NULL ) {
+	if ( (epsilon = (BitSequence *) mcalloc(tp.n, sizeof(BitSequence))) == NULL ) {
 		printf("BITSTREAM DEFINITION:  Insufficient memory available.\n");
 		printf("Statistical Testing Aborted!\n");
 		return;
@@ -308,7 +310,7 @@ readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile)
 			if ( fscanf(fp, "%1d", &bit) == EOF ) {
 				printf("ERROR:  Insufficient data in file %s.  %zd bits were read.\n", streamFile, bitsRead);
 				fclose(fp);
-				free(epsilon);
+				mfree(epsilon);
 				return;
 			}
 			else {
@@ -333,7 +335,7 @@ readHexDigitsInBinaryFormat(FILE *fp)
 	size_t  i, done, num_0s, num_1s, bitsRead;
 	uint8_t buffer[4];
 
-	if ( (epsilon = (BitSequence *) calloc(tp.n,sizeof(BitSequence))) == NULL ) {
+	if ( (epsilon = (BitSequence *) mcalloc(tp.n,sizeof(BitSequence))) == NULL ) {
 		printf("BITSTREAM DEFINITION:  Insufficient memory available.\n");
 		return;
 	}
@@ -357,7 +359,7 @@ readHexDigitsInBinaryFormat(FILE *fp)
 		nist_test_suite();
 
 	}
-	free(epsilon);
+	mfree(epsilon);
 }
 
 
