@@ -47,6 +47,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "../include/externs.h"
 #include "../include/decls.h"
 #include "../include/cephes.h"
 #include "../include/utilities.h"
@@ -71,7 +72,7 @@ main(int argc, char *argv[])
 		return 0;
 	}
 
-	tp.n = atoi(argv[1]);
+	tp.n = strtoull(argv[1], NULL, 10);
 	tp.blockFrequencyBlockLength = 128;
 	tp.nonOverlappingTemplateBlockLength = 9;
 	tp.overlappingTemplateBlockLength = 9;

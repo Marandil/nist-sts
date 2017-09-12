@@ -385,15 +385,15 @@ print_statistics(unsigned M,
 	}
 }
 
-unsigned int GAMBLER_NUM_OF_FILES;
-unsigned int GAMBLER_NUM_OF_TESTS;
+size_t GAMBLER_NUM_OF_FILES;
+size_t GAMBLER_NUM_OF_TESTS;
 
 static unsigned int GAMBLER_TEST_MASK;
 static unsigned int GAMBLER_S_START;
 static unsigned int GAMBLER_S_END;
 
 void
-Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
+Gambler(int M, size_t n, unsigned s_start, unsigned s_end, unsigned test_mask)
 {
 	stream_state st = { epsilon, 0, n, 0 };
 	unsigned s, c;

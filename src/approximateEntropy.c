@@ -4,19 +4,19 @@
 #include <stdlib.h>
 #include "../include/externs.h"
 #include "../include/utilities.h"
-#include "../include/cephes.h"  
+#include "../include/cephes.h"
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
                 A P P R O X I M A T E  E N T R O P Y   T E S T
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void
-ApproximateEntropy(int m, int n)
+ApproximateEntropy(int m, size_t n)
 {
 	int				i, j, k, r, blockSize, seqLength, powLen, index;
 	double			sum, numOfBlocks, ApEn[2], apen, chi_squared, p_value;
 	unsigned int	*P;
-	
+
 	fprintf(stats[TEST_APEN], "\t\t\tAPPROXIMATE ENTROPY TEST\n");
 	fprintf(stats[TEST_APEN], "\t\t--------------------------------------------\n");
 	fprintf(stats[TEST_APEN], "\t\tCOMPUTATIONAL INFORMATION:\n");
@@ -25,7 +25,7 @@ ApproximateEntropy(int m, int n)
 
 	seqLength = n;
 	r = 0;
-	
+
 	for ( blockSize=m; blockSize<=m+1; blockSize++ ) {
 		if ( blockSize == 0 ) {
 			ApEn[0] = 0.00;
@@ -64,10 +64,10 @@ ApproximateEntropy(int m, int n)
 		}
 	}
 	apen = ApEn[0] - ApEn[1];
-	
+
 	chi_squared = 2.0*seqLength*(log(2) - apen);
 	p_value = cephes_igamc(pow(2, m-1), chi_squared/2.0);
-	
+
 	fprintf(stats[TEST_APEN], "\t\t(b) n (sequence length) = %d\n", seqLength);
 	fprintf(stats[TEST_APEN], "\t\t(c) Chi^2               = %f\n", chi_squared);
 	fprintf(stats[TEST_APEN], "\t\t(d) Phi(m)	       = %f\n", ApEn[0]);
@@ -82,7 +82,7 @@ ApproximateEntropy(int m, int n)
 		fprintf(stats[TEST_APEN], "\t\tResults are inaccurate!\n");
 		fprintf(stats[TEST_APEN], "\t\t--------------------------------------------\n");
 	}
-	
+
 	fprintf(stats[TEST_APEN], "%s\t\tp_value = %f\n\n", p_value < ALPHA ? "FAILURE" : "SUCCESS", p_value); fflush(stats[TEST_APEN]);
 	fprintf(results[TEST_APEN], "%f\n", p_value); fflush(results[TEST_APEN]);
 }

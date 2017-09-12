@@ -24,8 +24,8 @@
 **  y      Address of array y            *
 **  l      Length both x and y in bytes  *
 **                                       *
-******************************************/ 
-int greater(BYTE *x, BYTE *y, int l)
+******************************************/
+int greater(uint8_t *x, uint8_t *y, int l)
 {
 	int		i;
 
@@ -55,8 +55,8 @@ int greater(BYTE *x, BYTE *y, int l)
 **  y      Address of array y            *
 **  l      Length both x and y in bytes  *
 **                                       *
-******************************************/ 
-int less(BYTE *x, BYTE *y, int l)
+******************************************/
+int less(uint8_t *x, uint8_t *y, int l)
 {
 	int		i;
 
@@ -79,18 +79,18 @@ int less(BYTE *x, BYTE *y, int l)
 /*****************************************
 ** bshl - shifts array left              *
 **                  by one bit.          *
-**                                       *	
+**                                       *
 ** x = x * 2                             *
 **                                       *
-** Parameters:                           *	
+** Parameters:                           *
 **                                       *
 **  x      Address of array x            *
 **  l      Length array x in bytes       *
 **                                       *
-******************************************/ 
-BYTE bshl(BYTE *x, int l)
+******************************************/
+uint8_t bshl(uint8_t *x, int l)
 {
-	BYTE	*p;
+	uint8_t	*p;
 	int		c1, c2;
 
 	p = x + l - 1;
@@ -113,25 +113,25 @@ BYTE bshl(BYTE *x, int l)
 	if ( c1 )
 		*p |= (DIGIT)1;
 
-	return (BYTE)c2;
+	return (uint8_t)c2;
 }
 
 
 /*****************************************
 ** bshr - shifts array right             *
 **                   by one bit.         *
-**                                       *	
+**                                       *
 ** x = x / 2                             *
 **                                       *
-** Parameters:                           *	
+** Parameters:                           *
 **                                       *
 **  x      Address of array x            *
-**  l      Length array x in bytes       *	
+**  l      Length array x in bytes       *
 **                                       *
 ******************************************/
-void bshr(BYTE *x, int l)	
+void bshr(uint8_t *x, int l)
 {
-	BYTE	*p;
+	uint8_t	*p;
 	int		c1,c2;
 
 	p = x;
@@ -159,7 +159,7 @@ void bshr(BYTE *x, int l)
 **                                       *
 ** A = B * C                             *
 **                                       *
-** Parameters:                           *	
+** Parameters:                           *
 **                                       *
 **  A      Address of the result         *
 **  B      Address of the multiplier     *
@@ -170,7 +170,7 @@ void bshr(BYTE *x, int l)
 **  NOTE:  A MUST be LB+LC in length     *
 **                                       *
 ******************************************/
-int Mult(BYTE *A, BYTE *B, int LB, BYTE *C, int LC)
+int Mult(uint8_t *A, uint8_t *B, int LB, uint8_t *C, int LC)
 {
 	int		i, j, k, LA;
 	DIGIT	result;
@@ -182,23 +182,23 @@ int Mult(BYTE *A, BYTE *B, int LB, BYTE *C, int LC)
 		for ( j=LC-1; j>=0; j-- ) {
 			k = i+j+1;
 			result = (DIGIT)A[k] + ((DIGIT)(B[i] * C[j])) + (result >> 8);
-			A[k] = (BYTE)result;
+			A[k] = (uint8_t)result;
 			}
-		A[--k] = (BYTE)(result >> 8);
+		A[--k] = (uint8_t)(result >> 8);
 	}
 
 	return 0;
 }
 
 
-void ModSqr(BYTE *A, BYTE *B, int LB, BYTE *M, int LM)
+void ModSqr(uint8_t *A, uint8_t *B, int LB, uint8_t *M, int LM)
 {
 
 	Square(A, B, LB);
 	Mod(A, 2*LB, M, LM);
 }
 
-void ModMult(BYTE *A, BYTE *B, int LB, BYTE *C, int LC, BYTE *M, int LM)
+void ModMult(uint8_t *A, uint8_t *B, int LB, uint8_t *C, int LC, uint8_t *M, int LM)
 {
 	Mult(A, B, LB, C, LC);
 	Mod(A, (LB+LC), M, LM);
@@ -210,17 +210,17 @@ void ModMult(BYTE *A, BYTE *B, int LB, BYTE *C, int LC, BYTE *M, int LM)
 **                                       *
 ** A = b * C                             *
 **                                       *
-** Parameters:                           *	
+** Parameters:                           *
 **                                       *
 **  A      Address of the result         *
-**  b      Scalar (1 BYTE)               *
+**  b      Scalar (1 uint8_t)               *
 **  C      Address of the multiplicand   *
 **  L      Length of C in bytes          *
 **                                       *
 **  NOTE:  A MUST be L+1 in length       *
 **                                       *
 ******************************************/
-void smult(BYTE *A, BYTE b, BYTE *C, int L)
+void smult(uint8_t *A, uint8_t b, uint8_t *C, int L)
 {
 	int		i;
 	DIGIT	result;
@@ -228,8 +228,8 @@ void smult(BYTE *A, BYTE b, BYTE *C, int L)
 	result = 0;
 	for ( i=L-1; i>0; i-- ) {
 		result = A[i] + ((DIGIT)b * C[i]) + (result >> 8);
-		A[i] = (BYTE)(result & 0xff);
-		A[i-1] = (BYTE)(result >> 8);
+		A[i] = (uint8_t)(result & 0xff);
+		A[i-1] = (uint8_t)(result >> 8);
 	}
 }
 
@@ -247,7 +247,7 @@ void smult(BYTE *A, BYTE b, BYTE *C, int L)
 **  NOTE:  A MUST be 2*L in length       *
 **                                       *
 ******************************************/
-void Square(BYTE *A, BYTE *B, int L)
+void Square(uint8_t *A, uint8_t *B, int L)
 {
 	Mult(A, B, L, B, L);
 }
@@ -256,8 +256,8 @@ void Square(BYTE *A, BYTE *B, int L)
 ** ModExp - Modular Exponentiation       *
 **                                       *
 ** A = B ** C (MOD M)                    *
-**                                       *	
-** Parameters:                           *	
+**                                       *
+** Parameters:                           *
 **                                       *
 **  A      Address of result             *
 **  B      Address of mantissa           *
@@ -274,9 +274,9 @@ void Square(BYTE *A, BYTE *B, int L)
 **        result stored in A will be     *
 **        only LM bytes long.            *
 ******************************************/
-void ModExp(BYTE *A, BYTE *B, int LB, BYTE *C, int LC, BYTE *M, int LM)
+void ModExp(uint8_t *A, uint8_t *B, int LB, uint8_t *C, int LC, uint8_t *M, int LM)
 {
-	BYTE	wmask;
+	uint8_t	wmask;
 	int		bits;
 
 	bits = LC*8;
@@ -309,7 +309,7 @@ void ModExp(BYTE *A, BYTE *B, int LB, BYTE *C, int LC, BYTE *M, int LM)
 			memcpy(A, A+LM+(LM+LB)-LM, LM);  /* A = lower LM bytes of temp */
 			memset(A+LM, 0x00, 2*LM);
 		}
- 
+
 		wmask >>= 1;
 		if ( !wmask ) {
 			wmask = 0x80;
@@ -329,17 +329,17 @@ void ModExp(BYTE *A, BYTE *B, int LB, BYTE *C, int LC, BYTE *M, int LM)
  *
  *  len of rem is lenx+1
  */
-int DivMod(BYTE *x, int lenx, BYTE *n, int lenn, BYTE *quot, BYTE *rem)
+int DivMod(uint8_t *x, int lenx, uint8_t *n, int lenn, uint8_t *quot, uint8_t *rem)
 {
-	BYTE	*tx, *tn, *ttx, *ts, bmult[1];
+	uint8_t	*tx, *tn, *ttx, *ts, bmult[1];
 	int		i, shift, lgth_x, lgth_n, t_len, lenq;
 	DIGIT	tMSn, mult;
-	ULONG	tMSx;
+	uint32_t	tMSx;
 	int		underflow;
 
 	tx = x;
 	tn = n;
-	
+
 	/* point to the MSD of n  */
 	for ( i=0, lgth_n=lenn; i<lenn; i++, lgth_n-- ) {
 		if ( *tn )
@@ -348,7 +348,7 @@ int DivMod(BYTE *x, int lenx, BYTE *n, int lenn, BYTE *quot, BYTE *rem)
 	}
 	if ( !lgth_n )
 		return 0;
-	
+
 	/* point to the MSD of x  */
 	for ( i=0, lgth_x=lenx; i<lenx; i++, lgth_x-- ) {
 		if ( *tx )
@@ -363,7 +363,7 @@ int DivMod(BYTE *x, int lenx, BYTE *n, int lenn, BYTE *quot, BYTE *rem)
 	else
 		lenq = lgth_x - lgth_n + 1;
 	memset(quot, 0x00, lenq);
-	
+
 	/* Loop while x > n,  WATCH OUT if lgth_x == lgth_n */
 	while ( (lgth_x > lgth_n) || ((lgth_x == lgth_n) && !less(tx, tn, lgth_n)) ) {
 		shift = 1;
@@ -424,7 +424,7 @@ int DivMod(BYTE *x, int lenx, BYTE *n, int lenn, BYTE *quot, BYTE *rem)
 			quot[lenq - (lgth_x - lgth_n) - 1] = bmult[0];
 		else
 			quot[lenq - (lgth_x - lgth_n)] = bmult[0];
-		
+
 		ttx = tx;
 		t_len = lgth_x;
 		for ( i=0, lgth_x=t_len; i<t_len; i++, lgth_x-- ) {
@@ -442,15 +442,15 @@ int DivMod(BYTE *x, int lenx, BYTE *n, int lenn, BYTE *quot, BYTE *rem)
 }
 
 
-/* 
+/*
  * Mod - Computes an integer modulo another integer
  *
  * x = x (mod n)
  *
  */
-void Mod(BYTE *x, int lenx, BYTE *n, int lenn)
+void Mod(uint8_t *x, int lenx, uint8_t *n, int lenn)
 {
-	BYTE	quot[MAXPLEN+1], rem[2*MAXPLEN+1];
+	uint8_t	quot[MAXPLEN+1], rem[2*MAXPLEN+1];
 
 	memset(quot, 0x00, sizeof(quot));
 	memset(rem, 0x00, sizeof(rem));
@@ -460,15 +460,15 @@ void Mod(BYTE *x, int lenx, BYTE *n, int lenn)
 	}
 }
 
-/* 
+/*
  * Div - Computes the integer division of two numbers
  *
  * x = x / n
  *
  */
-void Div(BYTE *x, int lenx, BYTE *n, int lenn)
+void Div(uint8_t *x, int lenx, uint8_t *n, int lenn)
 {
-	BYTE	quot[MAXPLEN+1], rem[2*MAXPLEN+1];
+	uint8_t	quot[MAXPLEN+1], rem[2*MAXPLEN+1];
 	int		lenq;
 
 	memset(quot, 0x00, sizeof(quot));
@@ -486,7 +486,7 @@ void Div(BYTE *x, int lenx, BYTE *n, int lenn)
 ** A = A - B                             *
 **                                       *
 **                                       *
-** Parameters:                           *	
+** Parameters:                           *
 **                                       *
 **  A      Address of subtrahend integer *
 **  B      Address of subtractor integer *
@@ -497,11 +497,11 @@ void Div(BYTE *x, int lenx, BYTE *n, int lenn)
 **        rather than using a copy of B  *
 **                                       *
 ******************************************/
-void sub(BYTE *A, int LA, BYTE *B, int LB)
+void sub(uint8_t *A, int LA, uint8_t *B, int LB)
 {
-	BYTE	*tb;
+	uint8_t	*tb;
 
-	tb = (BYTE *)calloc(LA, 1);
+	tb = (uint8_t *)calloc(LA, 1);
 	memcpy(tb, B, LB);
 	negate(tb, LB);
 	add(A, LA, tb, LA);
@@ -516,13 +516,13 @@ void sub(BYTE *A, int LA, BYTE *B, int LB)
 ** A = -A                                *
 **                                       *
 **                                       *
-** Parameters:                           *	
+** Parameters:                           *
 **                                       *
 **  A      Address of integer to negate  *
 **  L      Length of A in bytes          *
 **                                       *
 ******************************************/
-int negate(BYTE *A, int L)
+int negate(uint8_t *A, int L)
 {
 	int		i, tL;
 	DIGIT	accum;
@@ -536,7 +536,7 @@ int negate(BYTE *A, int L)
 	tL = L-1;
 	while ( accum && (tL >= 0) ) {
 		accum += A[tL];
-		A[tL--] = (BYTE)(accum & 0xff);
+		A[tL--] = (uint8_t)(accum & 0xff);
 		accum = accum >> 8;
 	}
 
@@ -552,7 +552,7 @@ int negate(BYTE *A, int L)
  * LB must be <= LA
  *
  */
-BYTE add(BYTE *A, int LA, BYTE *B, int LB)
+uint8_t add(uint8_t *A, int LA, uint8_t *B, int LB)
 {
 	int		i, indexA, indexB;
 	DIGIT	accum;
@@ -564,22 +564,22 @@ BYTE add(BYTE *A, int LA, BYTE *B, int LB)
 	for ( i = 0; i < LB; i++ ) {
 		accum += A[indexA];
 		accum += B[indexB--];
-		A[indexA--] = (BYTE)(accum & 0xff);
+		A[indexA--] = (uint8_t)(accum & 0xff);
 		accum = accum >> 8;
 	}
 
 	if ( LA > LB )
 		while ( accum  && (indexA >= 0) ) {
 			accum += A[indexA];
-			A[indexA--] = (BYTE)(accum & 0xff);
+			A[indexA--] = (uint8_t)(accum & 0xff);
 			accum = accum >> 8;
 		}
 
-	return (BYTE)accum;
+	return (uint8_t)accum;
 }
 
 
-void prettyprintBstr(char *S, BYTE *A, int L)
+void prettyprintBstr(char *S, uint8_t *A, int L)
 {
 	int		i, extra, ctrb, ctrl;
 
@@ -629,12 +629,12 @@ void prettyprintBstr(char *S, BYTE *A, int L)
 /**********************************************************************/
 /*  Performs byte reverse for PC based implementation (little endian) */
 /**********************************************************************/
-void byteReverse(ULONG *buffer, int byteCount)
+void byteReverse(uint32_t *buffer, int byteCount)
 {
-	ULONG value;
+	uint32_t value;
 	int count;
 
-	byteCount /= sizeof( ULONG );
+	byteCount /= sizeof( uint32_t );
 	for( count = 0; count < byteCount; count++ ) {
 		value = ( buffer[ count ] << 16 ) | ( buffer[ count ] >> 16 );
 		buffer[ count ] = ( ( value & 0xFF00FF00L ) >> 8 ) | ( ( value & 0x00FF00FFL ) << 8 );
@@ -642,25 +642,25 @@ void byteReverse(ULONG *buffer, int byteCount)
 }
 
 void
-ahtopb (char *ascii_hex, BYTE *p_binary, int bin_len)
+ahtopb (char *ascii_hex, uint8_t *p_binary, int bin_len)
 {
-	BYTE    nibble;
-	int     i; 
-	
+	uint8_t    nibble;
+	int     i;
+
 	for ( i=0; i<bin_len; i++ ) {
         nibble = ascii_hex[i * 2];
 	    if ( nibble > 'F' )
-	        nibble -= 0x20;   
+	        nibble -= 0x20;
 	    if ( nibble > '9' )
-	        nibble -= 7;      
-	    nibble -= '0';   
+	        nibble -= 7;
+	    nibble -= '0';
 	    p_binary[i] = nibble << 4;
-		
+
 	    nibble = ascii_hex[i * 2 + 1];
 	    if ( nibble > 'F' )
 			nibble -= 0x20;
         if ( nibble > '9' )
-            nibble -= 7;   
+            nibble -= 7;
         nibble -= '0';
 		p_binary[i] += nibble;
 	}

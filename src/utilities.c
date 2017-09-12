@@ -151,23 +151,23 @@ fixParameters()
 		printf("        P a r a m e t e r   A d j u s t m e n t s\n");
 		printf("        -----------------------------------------\n");
 		if ( testVector[TEST_BLOCK_FREQUENCY] == 1 )
-			printf("    [%d] Block Frequency Test - block length(M):         %d\n", counter++, tp.blockFrequencyBlockLength);
+			printf("    [%d] Block Frequency Test - block length(M):         %zd\n", counter++, tp.blockFrequencyBlockLength);
 		if ( testVector[TEST_NONPERIODIC] == 1 )
-			printf("    [%d] NonOverlapping Template Test - block length(m): %d\n", counter++, tp.nonOverlappingTemplateBlockLength);
+			printf("    [%d] NonOverlapping Template Test - block length(m): %zd\n", counter++, tp.nonOverlappingTemplateBlockLength);
 		if ( testVector[TEST_OVERLAPPING] == 1 )
-			printf("    [%d] Overlapping Template Test - block length(m):    %d\n", counter++, tp.overlappingTemplateBlockLength);
+			printf("    [%d] Overlapping Template Test - block length(m):    %zd\n", counter++, tp.overlappingTemplateBlockLength);
 		if ( testVector[TEST_APEN] == 1 )
-			printf("    [%d] Approximate Entropy Test - block length(m):     %d\n", counter++, tp.approximateEntropyBlockLength);
+			printf("    [%d] Approximate Entropy Test - block length(m):     %zd\n", counter++, tp.approximateEntropyBlockLength);
 		if ( testVector[TEST_SERIAL] == 1 )
-			printf("    [%d] Serial Test - block length(m):                  %d\n", counter++, tp.serialBlockLength);
+			printf("    [%d] Serial Test - block length(m):                  %zd\n", counter++, tp.serialBlockLength);
 		if ( testVector[TEST_LINEARCOMPLEXITY] == 1 )
-			printf("    [%d] Linear Complexity Test - block length(M):       %d\n", counter++, tp.linearComplexitySequenceLength);
+			printf("    [%d] Linear Complexity Test - block length(M):       %zd\n", counter++, tp.linearComplexitySequenceLength);
 		if ( testVector[TEST_GAMBLER] == 1 )
 		{
-			printf("    [%d] Gambler - runs per starting point(M):           %d\n", counter++, tp.gamblerRunsPerStartingPoint);
-			printf("                  first starting point (s_start):       %d\n", tp.gamblerStartStartingPoint);
-			printf("                  last starting point (s_end):          %d\n", tp.gamblerEndStartingPoint);
-			printf("                  test mask (mask):                     %d\n", tp.gamblerTestMask);
+			printf("    [%d] Gambler -\truns per starting point(M):          %zd\n", counter++, tp.gamblerRunsPerStartingPoint);
+			printf("                  \tfirst starting point (s_start):      %zd\n", tp.gamblerStartStartingPoint);
+			printf("                  \tlast starting point (s_end):         %zd\n", tp.gamblerEndStartingPoint);
+			printf("                  \ttest mask (mask):                    %zd\n", tp.gamblerTestMask);
 		}
 		printf("\n");
 		printf("   Select Test (0 to continue): ");
@@ -179,7 +179,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Block Frequency Test block length: ");
-				safe_scanf("%d", &tp.blockFrequencyBlockLength);
+				safe_scanf("%zd", &tp.blockFrequencyBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -188,7 +188,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter NonOverlapping Template Test block Length: ");
-				safe_scanf("%d", &tp.nonOverlappingTemplateBlockLength);
+				safe_scanf("%zd", &tp.nonOverlappingTemplateBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -197,7 +197,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Overlapping Template Test block Length: ");
-				safe_scanf("%d", &tp.overlappingTemplateBlockLength);
+				safe_scanf("%zd", &tp.overlappingTemplateBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -206,7 +206,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Approximate Entropy Test block Length: ");
-				safe_scanf("%d", &tp.approximateEntropyBlockLength);
+				safe_scanf("%zd", &tp.approximateEntropyBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -215,7 +215,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Serial Test block Length: ");
-				safe_scanf("%d", &tp.serialBlockLength);
+				safe_scanf("%zd", &tp.serialBlockLength);
 				printf("\n");
 				continue;
 			}
@@ -224,7 +224,7 @@ fixParameters()
 			counter++;
 			if ( counter == testid ) {
 				printf("   Enter Linear Complexity Test block Length: ");
-				safe_scanf("%d", &tp.linearComplexitySequenceLength);
+				safe_scanf("%zd", &tp.linearComplexitySequenceLength);
 				printf("\n");
 				continue;
 			}
@@ -239,16 +239,16 @@ fixParameters()
 				printf("                                  T4 - 8\n");
 
 				printf("   Enter number of runs per Gambler's starting point: ");
-				safe_scanf("%d", &tp.gamblerRunsPerStartingPoint);
+				safe_scanf("%zd", &tp.gamblerRunsPerStartingPoint);
 				printf("\n");
 				printf("   Enter the first Gambler's starting point: ");
-				safe_scanf("%d", &tp.gamblerStartStartingPoint);
+				safe_scanf("%zd", &tp.gamblerStartStartingPoint);
 				printf("\n");
 				printf("   Enter the last Gambler's starting point: ");
-				safe_scanf("%d", &tp.gamblerEndStartingPoint);
+				safe_scanf("%zd", &tp.gamblerEndStartingPoint);
 				printf("\n");
 				printf("   Enter the Gambler's test bit mask: ");
-				safe_scanf("%d", &tp.gamblerTestMask);
+				safe_scanf("%zd", &tp.gamblerTestMask);
 				printf("\n");
 				continue;
 			}
@@ -291,7 +291,8 @@ fileBasedBitStreams(char *streamFile)
 void
 readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile)
 {
-	int		i, j, num_0s, num_1s, bitsRead, bit;
+	size_t   i, j, num_0s, num_1s, bitsRead;
+	unsigned bit;
 
 	if ( (epsilon = (BitSequence *) calloc(tp.n, sizeof(BitSequence))) == NULL ) {
 		printf("BITSTREAM DEFINITION:  Insufficient memory available.\n");
@@ -305,7 +306,7 @@ readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile)
 		bitsRead = 0;
 		for ( j=0; j<tp.n; j++ ) {
 			if ( fscanf(fp, "%1d", &bit) == EOF ) {
-				printf("ERROR:  Insufficient data in file %s.  %d bits were read.\n", streamFile, bitsRead);
+				printf("ERROR:  Insufficient data in file %s.  %zd bits were read.\n", streamFile, bitsRead);
 				fclose(fp);
 				free(epsilon);
 				return;
@@ -319,7 +320,7 @@ readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile)
 				epsilon[j] = bit;
 			}
 		}
-		fprintf(freqfp, "\t\tBITSREAD = %d 0s = %d 1s = %d\n", bitsRead, num_0s, num_1s);
+		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s);
 		nist_test_suite();
 	}
 	free(epsilon);
@@ -329,8 +330,8 @@ readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile)
 void
 readHexDigitsInBinaryFormat(FILE *fp)
 {
-	int		i, done, num_0s, num_1s, bitsRead;
-	BYTE	buffer[4];
+	size_t  i, done, num_0s, num_1s, bitsRead;
+	uint8_t buffer[4];
 
 	if ( (epsilon = (BitSequence *) calloc(tp.n,sizeof(BitSequence))) == NULL ) {
 		printf("BITSTREAM DEFINITION:  Insufficient memory available.\n");
@@ -351,7 +352,7 @@ readHexDigitsInBinaryFormat(FILE *fp)
 			}
 			done = convertToBits(buffer, 32, tp.n, &num_0s, &num_1s, &bitsRead);
 		} while ( !done );
-		fprintf(freqfp, "\t\tBITSREAD = %d 0s = %d 1s = %d\n", bitsRead, num_0s, num_1s);
+		fprintf(freqfp, "\t\tBITSREAD = %zd 0s = %zd 1s = %zd\n", bitsRead, num_0s, num_1s);
 
 		nist_test_suite();
 
@@ -361,11 +362,11 @@ readHexDigitsInBinaryFormat(FILE *fp)
 
 
 int
-convertToBits(BYTE *x, int xBitLength, int bitsNeeded, int *num_0s, int *num_1s, int *bitsRead)
+convertToBits(BYTE *x, size_t xBitLength, size_t bitsNeeded, size_t *num_0s, size_t *num_1s, size_t *bitsRead)
 {
-	int		i, j, count, bit;
-	BYTE	mask;
-	int		zeros, ones;
+	size_t  i, j, count, bit;
+	BYTE	  mask;
+	size_t  zeros, ones;
 
 	count = 0;
 	zeros = ones = 0;
