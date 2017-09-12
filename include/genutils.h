@@ -3,6 +3,7 @@
 #define _GENUTILS_H_
 
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
@@ -10,7 +11,7 @@
 typedef struct _MP_struct {
 	int		size;	/*  in bytes  */
 	int		bitlen;	/*  in bits, duh  */
-	BYTE	*val;
+	uint8_t	*val;
 	} MP;
 
 #define	FREE(A)	if ( (A) ) { free((A)); (A) = NULL; }
@@ -25,24 +26,24 @@ typedef struct _MP_struct {
 /*
  * Function Declarations
  */
-int		greater(BYTE *x, BYTE *y, int l);
-int		less(BYTE *x, BYTE *y, int l);
-BYTE	bshl(BYTE *x, int l);
-void	bshr(BYTE *x, int l);
-int		Mult(BYTE *A, BYTE *B, int LB, BYTE *C, int LC);
-void	ModSqr(BYTE *A, BYTE *B, int LB, BYTE *M, int LM);
-void	ModMult(BYTE *A, BYTE *B, int LB, BYTE *C, int LC, BYTE *M, int LM);
-void	smult(BYTE *A, BYTE b, BYTE *C, int L);
-void	Square(BYTE *A, BYTE *B, int L);
-void	ModExp(BYTE *A, BYTE *B, int LB, BYTE *C, int LC, BYTE *M, int LM);
-int		DivMod(BYTE *x, int lenx, BYTE *n, int lenn, BYTE *quot, BYTE *rem);
-void	Mod(BYTE *x, int lenx, BYTE *n, int lenn);
-void	Div(BYTE *x, int lenx, BYTE *n, int lenn);
-void	sub(BYTE *A, int LA, BYTE *B, int LB);
-int		negate(BYTE *A, int L);
-BYTE	add(BYTE *A, int LA, BYTE *B, int LB);
-void	prettyprintBstr(char *S, BYTE *A, int L);
-void	byteReverse(ULONG *buffer, int byteCount);
-void	ahtopb (char *ascii_hex, BYTE *p_binary, int bin_len);
+int		greater(uint8_t *x, uint8_t *y, int l);
+int		less(uint8_t *x, uint8_t *y, int l);
+uint8_t	bshl(uint8_t *x, int l);
+void	bshr(uint8_t *x, int l);
+int		Mult(uint8_t *A, uint8_t *B, int LB, uint8_t *C, int LC);
+void	ModSqr(uint8_t *A, uint8_t *B, int LB, uint8_t *M, int LM);
+void	ModMult(uint8_t *A, uint8_t *B, int LB, uint8_t *C, int LC, uint8_t *M, int LM);
+void	smult(uint8_t *A, uint8_t b, uint8_t *C, int L);
+void	Square(uint8_t *A, uint8_t *B, int L);
+void	ModExp(uint8_t *A, uint8_t *B, int LB, uint8_t *C, int LC, uint8_t *M, int LM);
+int		DivMod(uint8_t *x, int lenx, uint8_t *n, int lenn, uint8_t *quot, uint8_t *rem);
+void	Mod(uint8_t *x, int lenx, uint8_t *n, int lenn);
+void	Div(uint8_t *x, int lenx, uint8_t *n, int lenn);
+void	sub(uint8_t *A, int LA, uint8_t *B, int LB);
+int		negate(uint8_t *A, int L);
+uint8_t	add(uint8_t *A, int LA, uint8_t *B, int LB);
+void	prettyprintBstr(char *S, uint8_t *A, int L);
+void	byteReverse(uint32_t *buffer, int byteCount);
+void	ahtopb (char *ascii_hex, uint8_t *p_binary, int bin_len);
 
 #endif  /* _GENUTILS_H_ */

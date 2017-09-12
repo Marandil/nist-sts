@@ -3,7 +3,7 @@
 //#include	"../include/sha.h"
 
 void	lcg();
-double	lcg_rand(int, double, double*, int);
+double	lcg_rand(size_t, double, double*, size_t);
 void	quadRes1();
 void	quadRes2();
 void	cubicRes();

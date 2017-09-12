@@ -9,7 +9,7 @@ void	fixParameters();
 void	fileBasedBitStreams(char *streamFile);
 void	readBinaryDigitsInASCIIFormat(FILE *fp, char *streamFile);
 void	readHexDigitsInBinaryFormat(FILE *fp);
-int		convertToBits(BYTE *x, int xBitLength, int bitsNeeded, int *num_0s, int *num_1s, int *bitsRead);
+int		convertToBits(BYTE *x, size_t xBitLength, size_t bitsNeeded, size_t *num_0s, size_t *num_1s, size_t *bitsRead);
 void	openOutputStreams(int option);
 void	invokeTestSuite(int option, char *streamFile);
 void	nist_test_suite();

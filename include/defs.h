@@ -1,3 +1,6 @@
+#ifndef DEFS_H
+#define DEFS_H
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
                        D E B U G G I N G  A I D E S
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -43,10 +46,6 @@
 #define	TEST_LINEARCOMPLEXITY			15
 #define	TEST_GAMBLER			16
 
-extern unsigned int GAMBLER_NUM_OF_FILES; /* Number of separate p-values produced
-                                             by the Gambler test */
-extern unsigned int GAMBLER_NUM_OF_TESTS; /* Number of Gambler tests run */
-
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
                    G L O B A L   D A T A  S T R U C T U R E S
@@ -55,16 +54,18 @@ extern unsigned int GAMBLER_NUM_OF_TESTS; /* Number of Gambler tests run */
 typedef unsigned char	BitSequence;
 
 typedef struct _testParameters {
-	int		n;
-	int		blockFrequencyBlockLength;
-	int		nonOverlappingTemplateBlockLength;
-	int		overlappingTemplateBlockLength;
-	int		serialBlockLength;
-	int		linearComplexitySequenceLength;
-	int		approximateEntropyBlockLength;
-	int		gamblerRunsPerStartingPoint;
-	int		gamblerStartStartingPoint;
-	int		gamblerEndStartingPoint;
-	int		gamblerTestMask;
-	int		numOfBitStreams;
+	size_t		n;
+	size_t		blockFrequencyBlockLength;
+	size_t		nonOverlappingTemplateBlockLength;
+	size_t		overlappingTemplateBlockLength;
+	size_t		serialBlockLength;
+	size_t		linearComplexitySequenceLength;
+	size_t		approximateEntropyBlockLength;
+	size_t		gamblerRunsPerStartingPoint;
+	size_t		gamblerStartStartingPoint;
+	size_t		gamblerEndStartingPoint;
+	size_t		gamblerTestMask;
+	size_t		numOfBitStreams;
 } TP;
+
+#endif
