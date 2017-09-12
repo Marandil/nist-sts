@@ -337,9 +337,11 @@ zero_arrays()
 		W1[i] = 0;
 		W2[i] = 0;
 		W3[i] = 0;
+		W4[i] = 0;
 		L1[i] = 0;
 		L2[i] = 0;
 		L3[i] = 0;
+		L4[i] = 0;
 	}
 }
 
@@ -408,9 +410,9 @@ Gambler(int M, int n, unsigned s_start, unsigned s_end, unsigned test_mask)
 	// Compute the total number of files produced, that is the number of p-values per
 	// test.
 	GAMBLER_NUM_OF_TESTS = ((test_mask >> 0) & 1)
-											 + ((test_mask >> 1) & 1)
-											 + ((test_mask >> 2) & 1)
-											 + ((test_mask >> 3) & 1);
+                             + ((test_mask >> 1) & 1)
+                             + ((test_mask >> 2) & 1)
+                             + ((test_mask >> 3) & 1);
 	GAMBLER_NUM_OF_FILES = (s_end - s_start + 1)
 	                     * GAMBLER_NUM_OF_TESTS
 											 * 2;
